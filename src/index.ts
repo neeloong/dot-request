@@ -1,70 +1,14 @@
 import createRequest from './createRequest';
-import send from './send';
-import type { RequestData } from './send';
-import type { Signal } from './types';
+import fetchData from './send';
+import type { Data, RequestData, RequestParams, Result, Signal } from './types';
+export type { Data, RequestData, RequestParams, Result, Signal } from './types';
 
-interface ChainRequest<T = unknown> {
-	get(path?: string): ChainRequest<T>;
-	post(path?: string): ChainRequest<T>;
-	put(path?: string): ChainRequest<T>;
-	delete(path?: string): ChainRequest<T>;
-	head(path?: string): ChainRequest<T>;
-	path(path: string): ChainRequest<T>;
-	root(path?: string): ChainRequest<T>;
-	append(...path: string[]): ChainRequest<T>;
-
-	header(name: string, value?: string | (() => string | undefined | null)): ChainRequest<T>;
-	headers(headers: Record<string, string | (() => string | undefined | null)>): ChainRequest<T>;
-
-	params(params?: Record<string, any>): ChainRequest<T>;
-	query(query?: Record<string, any>): ChainRequest<T>;
-	search(search?: string): ChainRequest<T>;
-	body(body?: ReadableStream | FormData | Blob | BufferSource | FormData | URLSearchParams): ChainRequest<T>;
-	data(data?: Record<string, any>): ChainRequest<T>;
-	body(body?: string | ArrayBuffer | ArrayBufferView): ChainRequest<T>;
-	body(body?: object | Record<string, any>, type?: string): ChainRequest<T>;
-	form(form?: FormData | Record<string, any>): ChainRequest<T>;
-
-	signal(signal?: Signal | boolean): ChainRequest<T>;
-	signalHandler(signalHandler?: Signal | ((v: any) => Signal)): ChainRequest<T>;
-
-	text(): Promise<string>;
-	blob(): Promise<Blob>;
-	arrayBuffer(): Promise<ArrayBuffer>;
-	formData(): Promise<FormData>;
-	json<V = T>(): Promise<V>;
-
-	ok(): Result<T>;
-	send(): Result<T>;
-	create(): Request;
-
-	then<TResult1 = Response, TResult2 = never>(onfulfilled?: ((value: Response) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
-	catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<Response | TResult>;
-	finally(onfinally?: (() => void) | undefined | null): Promise<Response>;
-
-	handler(...handlers: ((v: Response) => any)[]): ChainRequest<T>;
-	catcher(...catchers: ((v: any) => any)[]): ChainRequest<T>;
+function onlyOk(v: Response) {
+	if (v.ok) { return v }
+	throw v;
 }
 
-interface Result<T> {
-	text(): Promise<string>;
-	blob(): Promise<Blob>;
-	arrayBuffer(): Promise<ArrayBuffer>;
-	formData(): Promise<FormData>;
-	json<V = T>(): Promise<V>;
-
-	ok(): Result<T>;
-	clone(): Result<T>;
-	copy(): ChainRequest<T>;
-
-	then<TResult1 = Response, TResult2 = never>(onfulfilled?: ((value: Response) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
-	catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<Response | TResult>;
-	finally(onfinally?: (() => void) | undefined | null): Result<T>
-
-	do(handler?: ((v: Response) => any) | null, catcher?: ((v: any) => any) | null): Result<T>;
-}
-
-function result<T>(p: RequestData, response: Promise<Response>): Result<T> {
+function result<T, R extends DotRequest<T>>(p: R, response: Promise<Response>): Result<T, R> {
 	return {
 		text(): Promise<string> { return response.then(onlyOk).then(r => r.text()); },
 		blob(): Promise<Blob> { return response.then(onlyOk).then(r => r.blob()); },
@@ -72,13 +16,13 @@ function result<T>(p: RequestData, response: Promise<Response>): Result<T> {
 		formData(): Promise<FormData> { return response.then(onlyOk).then(r => r.formData()); },
 		json<V = T>(): Promise<V> { return response.then(onlyOk).then(r => r.json()); },
 
-		ok(): Result<T> { return result<T>(p, response.then(onlyOk)); },
-		clone() { return result<T>(p, response.then(r => r.clone())) },
-		copy() { return create(p) },
+		ok(): Result<T, R> { return result<T, R>(p, response.then(onlyOk)); },
+		clone() { return result<T, R>(p, response.then(r => r.clone())) },
+		copy() { return p.clone() },
 
 		then(r1, r2) { return response.then(r1, r2) },
 		catch(r) { return response.catch(r) },
-		finally(r) { return result<T>(p, response.finally(r)) },
+		finally(r) { return result<T, R>(p, response.finally(r)) },
 
 
 		do(handler, catcher) {
@@ -98,73 +42,181 @@ function result<T>(p: RequestData, response: Promise<Response>): Result<T> {
 
 }
 
-function onlyOk(v: Response) {
-	if (v.ok) { return v}
-	throw v;
-}
-function create<T = any>(p: RequestData): ChainRequest<T> {
-	return {
-		get(path = p.path) { return create<T>({ ...p, method: 'get', path }); },
-		post(path = p.path) { return create<T>({ ...p, method: 'post', path }); },
-		put(path = p.path) { return create<T>({ ...p, method: 'put', path }); },
-		delete(path = p.path) { return create<T>({ ...p, method: 'delete', path }); },
-		head(path = p.path) { return create<T>({ ...p, method: 'head', path }); },
-		path(path) { return create<T>({ ...p, path, append: [] }); },
-		root(root) { return create<T>({ ...p, root }); },
-		append(...path) { return create<T>({ ...p, append: [...p.append, ...path] }); },
+class DotRequest<T = unknown> {
+	private readonly __c: new (p: RequestData) => this
+	constructor(protected readonly _p: RequestData) {
+		this.__c = new.target as { new(p: RequestData): any }
+	}
+	get(path = this._p.path): this {
+		return new this.__c({ ...this._p, method: 'get', path });
+	}
+	post(path = this._p.path): this {
+		return new this.__c({ ...this._p, method: 'post', path });
+	}
+	put(path = this._p.path): this {
+		return new this.__c({ ...this._p, method: 'put', path });
+	}
+	delete(path = this._p.path): this {
+		return new this.__c({ ...this._p, method: 'delete', path });
+	}
+	head(path = this._p.path): this {
+		return new this.__c({ ...this._p, method: 'head', path });
+	}
+	path(path: string): this {
+		return new this.__c({ ...this._p, path });
+	}
+	root(root?: string): this {
+		return new this.__c({ ...this._p, root });
+	}
+	append(...path: string[]): this {
+		return new this.__c({ ...this._p, append: [...this._p.append || [], ...path] });
+	}
 
-		header(name, v) { return create<T>({ ...p, headers: {...p.headers, [name]: v} }); },
-		headers(headers) { return create<T>({ ...p, headers: {...p.headers, ...headers} }); },
+	header(name: string, value?: string | (() => string | undefined | null)): this {
+		return new this.__c({ ...this._p, headers: { ...this._p.headers, [name]: value } });
+	}
+	headers(headers: Record<string, string | (() => string | undefined | null)>): this {
+		return new this.__c({ ...this._p, headers: { ...this._p.headers, ...headers } });
+	}
 
-		params(params) { return create<T>({ ...p, params: {...p.params, ...params} }); },
-		query(query) { return create<T>({ ...p, query }); },
-		search(search) { return create<T>({ ...p, search }); },
-		data(data) { return create<T>({ ...p, data }); },
-		body(body?: any, type?: any) { return create<T>({ ...p, body, type }); },
-		form(form) { return create<T>({ ...p, body: form, type: true }); },
+	params(params?: Record<string, any>): this {
+		return new this.__c({ ...this._p, params: { ...this._p.params, ...params } });
+	}
+	query(query?: Record<string, any>): this {
+		return new this.__c({ ...this._p, query });
+	}
+	search(search?: string): this {
+		return new this.__c({ ...this._p, search });
+	}
+	data(data?: Record<string, any>): this {
+		return new this.__c({ ...this._p, data });
+	}
+	body(body?: ReadableStream | FormData | Blob | BufferSource | FormData | URLSearchParams): DotRequest<T>;
+	body(body?: string | ArrayBuffer | ArrayBufferView): DotRequest<T>;
+	body(body?: object | Record<string, any>, type?: string): DotRequest<T>;
+	body(body?: any, type?: any): this {
+		return new this.__c({ ...this._p, body, type });
+	}
+	form(form?: FormData | Record<string, any>): this {
+		return new this.__c({ ...this._p, body: form, type: true });
+	}
 
-		signal(signal) { return create<T>({ ...p, signal }); },
-		signalHandler(signalHandler) { return create<T>({ ...p, signalHandler }); },
+	signal(signal?: Signal | boolean): this {
+		return new this.__c({ ...this._p, signal });
+	}
+	signalHandler(signalHandler?: Signal | ((v: any) => Signal)): this {
+		return new this.__c({ ...this._p, signalHandler });
+	}
 
-		text(): Promise<string> { return send(p).then(onlyOk).then(r => r.text()); },
-		blob(): Promise<Blob> { return send(p).then(onlyOk).then(r => r.blob()); },
-		arrayBuffer(): Promise<ArrayBuffer> { return send(p).then(onlyOk).then(r => r.arrayBuffer()); },
-		formData(): Promise<FormData> { return send(p).then(onlyOk).then(r => r.formData()); },
-		json<V = T>(): Promise<V> { return send(p).then(onlyOk).then(r => r.json()); },
+	handler(...handlers: ((v: Response) => any)[]): this {
+		return new this.__c({ ...this._p, handlers: [...this._p.handlers || [], ...handlers] });
+	}
+	catcher(...catchers: ((v: any) => any)[]): this {
+		return new this.__c({ ...this._p, catchers: [...this._p.catchers || [], ...catchers] });
+	}
 
-		ok(): Result<T> { return result<T>(p, send(p).then(onlyOk)); },
-		send(): Result<T> { return result<T>(p, send(p)); },
-		create() { return createRequest(p)},
+	interface(fetch?: (request: Request) => Response | Promise<Response>): this {
+		return new this.__c({ ...this._p, fetch });
+	}
 
-		then(r1, r2) { return send(p).then(r1, r2) },
-		catch(r) { return send(p).catch(r) },
-		finally(r) { return send(p).finally(r) },
-		handler(...handlers) { return create<T>({ ...p, handlers: [...p.handlers, ...handlers] }); },
-		catcher(...catchers) { return create<T>({ ...p, catchers: [...p.catchers, ...catchers] }); },
-	
+	clone(): this {
+		return new this.__c(this._p);
+	}
+	create(): Request {
+		return createRequest(this._p)
+	}
+	async fetch(): Promise<Response> {
+		const { handlers, catchers, fetch } = this._p;
+		const request = this.create();
+		const response = await fetchData(request, catchers, fetch);
+		for (const handler of handlers || []) {
+			if (typeof handler !== 'function') { continue }
+			await handler(response);
+		}
+		return response;
+	}
+
+	text(): Promise<string> {
+		return this.fetch().then(onlyOk).then(r => r.text());
+	}
+	blob(): Promise<Blob> {
+		return this.fetch().then(onlyOk).then(r => r.blob());
+	}
+	arrayBuffer(): Promise<ArrayBuffer> {
+		return this.fetch().then(onlyOk).then(r => r.arrayBuffer());
+	}
+	formData(): Promise<FormData> {
+		return this.fetch().then(onlyOk).then(r => r.formData());
+	}
+	json<V = T>(): Promise<V> {
+		return this.fetch().then(onlyOk).then(r => r.json());
+	}
+	send(): Result<T, this> {
+		return result<T, this>(this, this.fetch());
+	}
+	ok(): Result<T, this> {
+		return result<T, this>(this, this.fetch().then(onlyOk));
+	}
+
+
+	then<TResult1 = Response, TResult2 = never>(
+		onfulfilled?: ((value: Response) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+		onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null
+	): Promise<TResult1 | TResult2> {
+		return this.fetch().then(onfulfilled, onrejected)
+	}
+	catch<TResult = never>(
+		onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null,
+	): Promise<Response | TResult> {
+		return this.fetch().catch(onrejected)
+	}
+	finally(
+		onfinally?: (() => void) | undefined | null,
+	): Promise<Response> {
+		return this.fetch().finally(onfinally);
+	}
+
+	static get<T>(path: string) {
+		return new this<T>({ method: 'get', path });
+	}
+	static post<T>(path: string) {
+		return new this<T>({ method: 'post', path });
+	}
+	static put<T>(path: string) {
+		return new this<T>({ method: 'put', path });
+	}
+	static delete<T>(path: string) {
+		return new this<T>({ method: 'delete', path });
+	}
+	static head<T>(path: string) {
+		return new this<T>({ method: 'head', path });
+	}
+	static root<T>(root: string) {
+		return new this<T>({ root });
+	}
+	static path<T>(path: string) {
+		return new this<T>({ path });
+	}
+	static header<T>(name: string, value: string | (() => string | undefined | null)) {
+		return new this<T>({ headers: { [name]: value } });
+	}
+	static headers<T>(headers: Record<string, string | (() => string | undefined | null)>) {
+		return new this<T>({ headers: { ...headers } });
+	}
+
+	static signalHandler<T>(signalHandler?: Signal | ((v: any) => Signal)) {
+		return new this<T>({ signalHandler })
+	}
+	static handlers<T>(...handlers: ((v: Response) => any)[]) {
+		return new this<T>({ handlers })
+	}
+	static catchers<T extends DotRequest<T>>(this: new (p: RequestData) => T, ...catchers: ((v: any) => any)[]): T {
+		return new this({ catchers })
 	}
 }
-
-function ChainRequest<T>(fetch?: (request: Request) => Promise<Response>) {
-	if (typeof fetch !== 'function') { fetch = undefined; }
-	return create<T>({fetch, append: [], handlers: [], catchers: []});
-}
-declare namespace ChainRequest {
-	export { Signal, Result };
+declare namespace DotRequest {
+	export { Data, RequestData, RequestParams, Result, Signal };
 }
 
-ChainRequest.get = <T>(path: string) => create<T>({ method: 'get', path, append: [], handlers: [], catchers: []});
-ChainRequest.post = <T>(path: string) => create<T>({ method: 'post', path, append: [], handlers: [], catchers: []});
-ChainRequest.put = <T>(path: string) => create<T>({ method: 'put', path, append: [], handlers: [], catchers: []});
-ChainRequest.delete = <T>(path: string) => create<T>({ method: 'delete', path, append: [], handlers: [], catchers: []});
-ChainRequest.head = <T>(path: string) => create<T>({ method: 'head', path, append: [], handlers: [], catchers: []});
-ChainRequest.root = <T>(root: string) => create<T>({ root, append: [], handlers: [], catchers: []});
-ChainRequest.path = <T>(path: string) => create<T>({ path, append: [], handlers: [], catchers: []});
-ChainRequest.header = <T>(name: string, value: string | (() => string | undefined | null)) => create<T>({ headers: {[name]: value}, append: [], handlers: [], catchers: []});
-ChainRequest.headers = <T>(headers: Record<string, string | (() => string | undefined | null)>) => create<T>({ headers: {...headers}, append: [], handlers: [], catchers: []});
 
-ChainRequest.signalHandler = <T>(signalHandler?: Signal | ((v: any) => Signal)) => create<T>({ signalHandler, append: [], handlers: [], catchers: [] })
-ChainRequest.handlers = <T>(...handlers: ((v: Response) => any)[]) => create<T>({ append: [], handlers, catchers: [] })
-ChainRequest.catchers = <T>(...catchers: ((v: any) => any)[]) => create<T>({ append: [], handlers: [], catchers })
-
-export default ChainRequest;
+export default DotRequest;

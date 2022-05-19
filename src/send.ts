@@ -1,36 +1,19 @@
-import createRequest, { RequestParams } from './createRequest';
-
-export interface RequestData extends RequestParams {
-	handlers: ((v: Response) => any)[];
-	catchers: ((v: any) => any)[];
-	fetch?(request: Request): Promise<Response>;
-}
-
-async function fetchData(
-	send: (request: Request) => Promise<Response> = fetch,
-	catchers: ((v: any) => any)[],
+export default async function fetchData(
 	request: Request,
+	catchers?: ((v: any) => any)[],
+	send?: (request: Request) => Response | Promise<Response>,
 ) {
 	try {
-		return await send(request);
+		if (typeof send === 'function') {
+			return await send(request);
+		} else {
+			return await fetch(request);
+		}
 	} catch (e) {
-		for (const handler of catchers) {
+		for (const handler of catchers || []) {
 			if (typeof handler !== 'function') { continue }
 			await handler(e);
 		}
 		throw e;
 	}
-}
-
-export default async function send({
-	handlers, catchers, fetch,
-	...params
-}: RequestData) {
-	const response = await fetchData(fetch, catchers, createRequest(params));
-	for (const handler of handlers) {
-		if (typeof handler !== 'function') { continue }
-		await handler(response);
-	}
-	return response;
-
 }

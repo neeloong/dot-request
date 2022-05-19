@@ -1,29 +1,11 @@
 
-import type { Signal, Method } from '../types';
+import type { RequestParams } from '../types';
 
 import getSignal from './getSignal';
 import getPath from './getPath';
 import createHeaders from './createHeaders';
 import createForm from './createForm';
 
-export interface RequestParams {
-	method?: Method;
-	path?: string;
-	root?: string;
-	append: string[];
-
-	headers?: Record<string, string | undefined | null | (() => string | undefined | null)>;
-
-	params?: Record<string, any>;
-	query?: Record<string, any>;
-	search?: string;
-	data?:any;
-	body?:any;
-	type?: any;
-
-	signal?: Signal | boolean;
-	signalHandler?: Signal | ((v: any) => Signal);
-}
 
 
 export default function createRequest({
@@ -62,7 +44,7 @@ export default function createRequest({
 			init.body = JSON.stringify(body);
 		}
 	}
-	const fullPath = getPath(root, path, append, params, query, search, body || ['get', 'head'].includes(method) ? data : undefined);
+	const fullPath = getPath(root, path, append || [], params, query, search, body || ['get', 'head'].includes(method) ? data : undefined);
 	return new Request(fullPath, init)
 
 }
