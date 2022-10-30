@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noImplicitThis": true,
+    "moduleResolution": "Node"
+  }
+}
