@@ -1,9 +1,9 @@
-import resolve from 'rollup-plugin-node-resolve';
-import babel from 'rollup-plugin-babel';
+import resolve from '@rollup/plugin-node-resolve';
+import babel from '@rollup/plugin-babel';
 import dts from 'rollup-plugin-dts';
-import replace from 'rollup-plugin-replace';
-import fsFn from 'fs';
-import info from './package.json';
+import replace from '@rollup/plugin-replace';
+import fsPromise from 'node:fs/promises';
+const info = JSON.parse(await fsPromise.readFile('./package.json', 'utf-8'))
 const {
 	name, description, version, engines, dependencies,
 	author, license, homepage, repository, bugs,
@@ -19,11 +19,10 @@ const banner = `\
 */
 `;
 
-try {
-	fsFn.rmSync('dist', { recursive: true });
-} catch { }
-fsFn.mkdirSync(`dist`, { recursive: true });
-fsFn.writeFileSync(`dist/package.json`, JSON.stringify({
+
+await fsPromise.rm('dist', { recursive: true }).catch(() => {});
+await fsPromise.mkdir(`dist`, { recursive: true });
+await fsPromise.writeFile(`dist/package.json`, JSON.stringify({
 	name, description, version, engines, dependencies,
 	module: 'index.mjs',
 	main: 'index.cjs',
@@ -32,8 +31,8 @@ fsFn.writeFileSync(`dist/package.json`, JSON.stringify({
 	author, license, homepage, repository, bugs,
 	exports: {
 		'.': {
-			import: './index.mjs',
-			require: './index.cjs',
+			node: './index.cjs',
+			module: './index.mjs',
 			unpkg: './index.js',
 			jsdelivr: './index.js',
 		},
@@ -64,7 +63,7 @@ export default [
 				extensions: ['.ts'],
 				plugins: ['@babel/plugin-transform-typescript'],
 			}),
-			replace({ __VERSION__: version }),
+			replace({ preventAssignment: true, values: {__VERSION__: version} }),
 		],
 	}, {
 		input: 'src/index.ts',
