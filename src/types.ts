@@ -43,7 +43,16 @@ export interface RequestParams {
 	signal?: Signal | boolean;
 	signalHandler?: SignalMapToken | SignalMap | ((v: any) => Signal);
 
-	redirect: boolean | 'error';
+	redirect: boolean | 'error' | 'follow' | 'manual';
+
+	timeout?: number;
+	integrity?: string;
+	keepalive?: boolean;
+	credentials?: '' | RequestCredentials;
+	mode?: '' | RequestMode;
+	cache?: '' | RequestCache;
+	referrer?: string;
+	referrerPolicy?: '' | ReferrerPolicy
 }
 
 export interface RequestData extends RequestParams {
@@ -116,12 +125,12 @@ export interface Fetch<
 }
 export type Trans<T extends Record<string, any>, A extends any[], R, E>
 	= E extends DotRequest<T, infer FA, infer FR>
-		? unknown[] extends FA
-			? unknown extends FR
-				? DotRequest<T, A, R>
-				: E
-			: E
-		: E;
+	? unknown[] extends FA
+	? unknown extends FR
+	? DotRequest<T, A, R>
+	: E
+	: E
+	: E;
 
 export type DotRequest<
 	T extends Record<string, any> = {},
@@ -130,8 +139,8 @@ export type DotRequest<
 > = Api<T, A, R> & {
 	[P in Exclude<keyof T, keyof Api<T, A, R>>]:
 	T[P] extends (...a: infer FA) => infer FR
-		? (...a: FA) => Trans<T, A, R, FR>
-		: Trans<T, A, R, T[P]>;
+	? (...a: FA) => Trans<T, A, R, FR>
+	: Trans<T, A, R, T[P]>;
 };
 export interface Api<
 	T extends Record<string, any>,
@@ -212,12 +221,69 @@ export interface Api<
 	 * @enum `true` 自动重定向
 	 * @enum `false` 不进行重定向
 	 * @enum `'error'` 如果产生重定向将自动终止并且抛出一个错误
-	*/
+	 */
 	redirect(redirect: boolean | 'error'): this;
 	/**
 	 * 获取重定向模式
-	*/
+	 */
 	redirect(): boolean | 'error';
+	/**
+	 * 设置超时时间
+	 * @param ms 超时时间，单位毫秒
+	 */
+	timeout(ms: number): this;
+	/** 获取设置的超时时间 */
+	timeout(): number;
+	/**
+	 * 设置请求模式
+	 * @param mode 请求模式
+	 */
+	mode(mode: RequestMode): this;
+	/** 获取设置的请求模式 */
+	mode(): '' | RequestMode;
+	/**
+	 * 设置缓存模式
+	 * @param cache 缓存模式
+	 */
+	cache(cache: '' | RequestCache): this;
+	/** 获取设置的缓存模式 */
+	cache(): '' | RequestCache;
+	/**
+	 * 指定请求头中 referrer 的模式
+	 * @param referrer referrer 的模式
+	 */
+	referrer(referrer: string): this;
+	/** 获取已设置的请求头中 referrer 的模式 */
+	referrer(): string;
+	/**
+	 * 设置请求头中 Referrer-Policy
+	 * @param referrer Referrer-Policy 值
+	 */
+	referrerPolicy(referrerPolicy: '' | ReferrerPolicy): this;
+	/** 获取已设置的请求头中 Referrer-Policy */
+	referrerPolicy(): '' | ReferrerPolicy;
+	/**
+	 * 设置浏览器对凭证信息的控制方式
+	 * @param credentials 操作方式
+	 */
+	credentials(credentials: '' | RequestCredentials): this;
+	/** 获取已设置浏览器对凭证信息的控制方式 */
+	credentials(): ''  | RequestCredentials;
+	/**
+	 * 设置子资源完整性验证信息
+	 * @param integrity 验证字符串
+	 * @see [子资源完整性(SRI)](https://developer.mozilla.org/zh-CN/docs/Web/Security/Subresource_Integrity)
+	*/
+	integrity(integrity: string): this;
+	/** 获取已设置的子资源完整性验证信息 */
+	integrity(): string;
+	/**
+	 * 设置在页面被关闭后，链接是否可以继续保持活跃
+	 * @param keep 是否保持活跃
+	 */
+	keepalive(keep: boolean): this;
+	/** 获取已设置的活跃配置 */
+	keepalive(): boolean;
 	/**
 	 * 获取设置的上下文数据
 	 * @param name 要获取的请求头名称

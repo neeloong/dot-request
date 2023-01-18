@@ -4,7 +4,7 @@ import getSignal from './getSignal';
 import getPath from './getPath';
 import createHeaders from './createHeaders';
 import createForm from './createForm';
-
+import mergeSignal from './mergeSignal';
 
 export default function createRequest({
 	method = 'get',
@@ -12,13 +12,27 @@ export default function createRequest({
 	params, query, search, data, body, type,
 	signal, signalHandler,
 	headers: baseHeaders,
+
+	timeout,
+	integrity, keepalive, credentials, mode, cache, referrer, referrerPolicy
 }: RequestParams) {
 	const headers: HeadersInit = createHeaders(baseHeaders);
 	const init: RequestInit = {
 		method,
 		headers,
-		signal: getSignal(signal, signalHandler),
+		signal: mergeSignal(
+			getSignal(signal, signalHandler),
+			timeout ? AbortSignal.timeout(timeout) : undefined
+		),
 	};
+	if (keepalive) { init.keepalive = true; }
+	if (credentials) { init.credentials = credentials; }
+	if (cache) { init.cache = cache; }
+	if (mode) { init.mode = mode; }
+	if (referrer) { init.referrer = referrer; }
+	if (referrerPolicy) { init.referrerPolicy = referrerPolicy; }
+	if (integrity) { init.integrity = integrity; }
+
 	if (method !== 'get' && method !== 'head') {
 		if (body instanceof FormData) {
 			init.body = body;

@@ -61,6 +61,38 @@ function create<
 				redirect: typeof redirect === 'boolean' ? redirect : 'error',
 			});
 		},
+		timeout(t?: number) {
+			if (t === undefined) { return p.timeout || 0;}
+			return init({timeout: typeof t === 'number' && t > 0 ? t : 0})
+		},
+		credentials(credentials) {
+			if (credentials === undefined) { return p.credentials || '' }
+			return init({ credentials: credentials || undefined });
+		},
+		mode(mode) {
+			if (mode === undefined) { return p.mode || '' }
+			return init({ mode: typeof mode === 'string' && mode || undefined });
+		},
+		cache(cache) {
+			if (cache === undefined) { return p.cache || '' }
+			return init({ cache: typeof cache === 'string' && cache || undefined });
+		},
+		referrer(referrer) {
+			if (referrer === undefined) { return p.referrer || '' }
+			return init({ referrer: typeof referrer === 'string' && referrer || undefined });
+		},
+		referrerPolicy(referrerPolicy) {
+			if (referrerPolicy === undefined) { return p.referrerPolicy || '' }
+			return init({ referrerPolicy: typeof referrerPolicy === 'string' && referrerPolicy || undefined });
+		},
+		integrity(integrity) {
+			if (integrity === undefined) { return p.integrity || '' }
+			return init({ integrity: typeof integrity === 'string' && integrity || undefined });
+		},
+		keepalive(keep?: boolean) {
+			if (typeof keep !== 'boolean') { return p.keepalive || false; }
+				return init({ keepalive: keep });
+		},
 		context(name: string | Record<string, any>, value?: any) {
 			if (typeof name !== 'string') {
 				return init({ context: { ...p.context, ...name } });
