@@ -3,7 +3,7 @@ import babel from '@rollup/plugin-babel';
 import dts from 'rollup-plugin-dts';
 import replace from '@rollup/plugin-replace';
 import fsPromise from 'node:fs/promises';
-const info = JSON.parse(await fsPromise.readFile('./package.json', 'utf-8'))
+const info = JSON.parse(await fsPromise.readFile('./package.json', 'utf-8'));
 const {
 	name, description, version, engines, dependencies,
 	author, license, homepage, repository, bugs,
@@ -31,6 +31,7 @@ await fsPromise.writeFile(`dist/package.json`, JSON.stringify({
 	author, license, homepage, repository, bugs,
 	exports: {
 		'.': {
+			type: './index.d.js',
 			node: './index.cjs',
 			module: './index.mjs',
 			unpkg: './index.js',
@@ -51,7 +52,7 @@ function createOutput(format, ext) {
 
 export default [
 	{
-		input: 'src/index.ts',
+		input: 'src/index.mjs',
 		output: [
 			createOutput('esm', 'mjs'),
 			createOutput('cjs', 'cjs'),
@@ -66,7 +67,7 @@ export default [
 			replace({ preventAssignment: true, values: {__VERSION__: version} }),
 		],
 	}, {
-		input: 'src/index.ts',
+		input: 'src/types.mts',
 		output: { file: 'dist/index.d.ts', format: 'esm', banner },
 		plugins: [dts()],
 	},

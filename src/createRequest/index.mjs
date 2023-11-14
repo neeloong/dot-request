@@ -1,11 +1,13 @@
-import type { RequestParams } from '../types';
-
-import getSignal from './getSignal';
-import getPath from './getPath';
-import createHeaders from './createHeaders';
-import createForm from './createForm';
-import mergeSignal from './mergeSignal';
-
+import getSignal from './getSignal.mjs';
+import getPath from './getPath.mjs';
+import createHeaders from './createHeaders.mjs';
+import createForm from './createForm.mjs';
+import mergeSignal from './mergeSignal.mjs';
+/**
+ *
+ * @param {import('../types.mjs').RequestParams} params
+ * @returns {Request}
+ */
 export default function createRequest({
 	method = 'get',
 	prefix, path, append, suffix,
@@ -14,15 +16,17 @@ export default function createRequest({
 	headers: baseHeaders,
 
 	timeout,
-	integrity, keepalive, credentials, mode, cache, referrer, referrerPolicy
-}: RequestParams) {
-	const headers: HeadersInit = createHeaders(baseHeaders);
-	const init: RequestInit = {
+	integrity, keepalive, credentials, mode, cache, referrer, referrerPolicy,
+}) {
+	/** @type {HeadersInit} */
+	const headers = createHeaders(baseHeaders);
+	/** @type {RequestInit} */
+	const init = {
 		method,
 		headers,
 		signal: mergeSignal(
 			getSignal(signal, signalHandler),
-			timeout ? AbortSignal.timeout(timeout) : undefined
+			timeout ? AbortSignal.timeout(timeout) : null,
 		),
 	};
 	if (keepalive) { init.keepalive = true; }

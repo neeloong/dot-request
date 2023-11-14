@@ -1,7 +1,9 @@
-import type { Result } from './types';
-
-
-export default function result(response: Promise<Response>): Result {
+/**
+ *
+ * @param {Promise<Response>} response
+ * @returns {import('./types.mjs').Result}
+ */
+export default function result(response) {
 	return {
 		get version() { return '__VERSION__'; },
 		text() { return response.then(r => r.text()); },

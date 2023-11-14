@@ -1,5 +1,4 @@
-import type { SignalMap, Signal, SignalMapToken } from '../types';
-import createSignalMap from '../createSignalMap';
+import createSignalMap from '../createSignalMap.mjs';
 
 const types = new Set([
 	'object',
@@ -11,10 +10,13 @@ const types = new Set([
 ]);
 const abortTokens = createSignalMap();
 
-function toSignal(
-	tokens: SignalMap,
-	signal?: any,
-): AbortSignal | undefined {
+/**
+ *
+ * @param {import('../types.mjs').SignalMap} tokens
+ * @param {*} [signal]
+ * @returns {AbortSignal | undefined}
+ */
+function toSignal(tokens, signal) {
 	if (!types.has(typeof signal)) { return; }
 	if (signal === null || signal === false) { return; }
 	tokens.get(signal)?.abort();
@@ -22,7 +24,12 @@ function toSignal(
 	tokens.set(signal, ac);
 	return ac.signal;
 }
-function isSignalMap(v: any): v is SignalMap {
+/**
+ *
+ * @param {*} v
+ * @returns {v is import('../types.mjs').SignalMap}
+ */
+function isSignalMap(v) {
 	if (!v) { return false; }
 	if (typeof v !== 'object') { return false; }
 	if (typeof v.get !== 'function') { return false; }
@@ -30,11 +37,16 @@ function isSignalMap(v: any): v is SignalMap {
 	return true;
 }
 
-
-const signalMaps = new Map<SignalMapToken, SignalMap>();
+/** @type {Map<import('../types.mjs').SignalMapToken, import('../types.mjs').SignalMap>} */
+const signalMaps = new Map();
 
 const mapTypes = new Set(['string', 'symbol', 'number', 'bigint']);
-function toSignalMap(handler?: any): SignalMap {
+/**
+ *
+ * @param {*} [handler]
+ * @returns {import('../types.mjs').SignalMap}
+ */
+function toSignalMap(handler) {
 	if (isSignalMap(handler)) { return handler; }
 	if (!mapTypes.has(typeof handler)) { return abortTokens; }
 	const oldMap = signalMaps.get(handler);
@@ -43,9 +55,15 @@ function toSignalMap(handler?: any): SignalMap {
 	signalMaps.set(handler, map);
 	return map;
 }
+/**
+ *
+ * @param {import('../types.mjs').Signal} [signal]
+ * @param {import('../types.mjs').SignalMap | import('../types.mjs').SignalMapToken | ((v: any) => import('../types.mjs').Signal)} [handler]
+ * @returns
+ */
 export default function getSignal(
-	signal?: Signal,
-	handler?: SignalMap | SignalMapToken | ((v: any) => Signal),
+	signal,
+	handler,
 ) {
 	if (signal instanceof AbortSignal) { return signal; }
 	if (signal === null || signal === undefined || signal === false) { return; }

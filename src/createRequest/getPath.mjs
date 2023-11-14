@@ -1,12 +1,24 @@
-import getFromData from './getFromData';
+import getFromData from './getFromData.mjs';
 
-function getKey(name: string, keys: string[]) {
+/**
+ *
+ * @param {string} name
+ * @param {string[]} keys
+ * @returns
+ */
+function getKey(name, keys) {
 	const nameDecoded = decodeURIComponent(name);
 	const keysDecoded = keys.map(k => `[${decodeURIComponent(k)}]`).join('');
 	return `${nameDecoded}${keysDecoded}`;
 }
-function queryStringify(query: any) {
-	const text: string[] = [];
+/**
+ *
+ * @param {*} query
+ * @returns
+ */
+function queryStringify(query) {
+	/** @type {string[]} */
+	const text = [];
 	if (!query) { return text; }
 	for (const [k, v] of Object.entries(query)) {
 		for (const [name, keys, value] of getFromData(k, [], v)) {
@@ -25,7 +37,12 @@ function queryStringify(query: any) {
 	return text;
 }
 
-function createReplace(params?: Record<string, any>): (p: string) => string {
+/**
+ *
+ * @param {Record<string, any>} [params]
+ * @returns {(p: string) => string}
+ */
+function createReplace(params) {
 	if (params) {
 		return p => p.replace(
 			/:([a-zA-Z0-9][a-z0-9]*)/g,
@@ -36,15 +53,27 @@ function createReplace(params?: Record<string, any>): (p: string) => string {
 }
 
 const regex = /^([^?#]*)((?:\?[^#]*)?)((?:#[\s\S]*)?)$/;
+/**
+ *
+ * @param {string | undefined} prefix
+ * @param {string | undefined} path
+ * @param {string[]} append
+ * @param {string | undefined} suffix
+ * @param {Record<string, any>} [params]
+ * @param {*} [query]
+ * @param {*} [search]
+ * @param {*} [data]
+ * @returns
+ */
 export default function getPath(
-	prefix: string | undefined,
-	path: string | undefined,
-	append: string[],
-	suffix: string | undefined,
-	params?: Record<string, any>,
-	query?: any,
-	search?: any,
-	data?: any,
+	prefix,
+	path,
+	append,
+	suffix,
+	params,
+	query,
+	search,
+	data,
 ) {
 	const paths = [prefix, path, ...append]
 		.map(p => p && regex.exec(p) || ['', '', '']);

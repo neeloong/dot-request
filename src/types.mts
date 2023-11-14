@@ -1,3 +1,4 @@
+import dt from './index.mjs';
 export type Signal =
 	| AbortSignal
 	| number
@@ -11,7 +12,6 @@ export interface SignalMap {
 	set(signal: Exclude<Signal, AbortSignal>, ac: AbortController): void;
 }
 export type SignalMapToken = number | bigint | string | symbol;
-
 
 export type Data =
 	| FormData
@@ -49,10 +49,10 @@ export interface RequestParams {
 	integrity?: string;
 	keepalive?: boolean;
 	credentials?: '' | RequestCredentials;
-	mode?: '' | RequestMode;
-	cache?: '' | RequestCache;
-	referrer?: string;
-	referrerPolicy?: '' | ReferrerPolicy
+	mode?: '' | RequestMode | null;
+	cache?: '' | RequestCache | null;
+	referrer?: string | null;
+	referrerPolicy?: '' | ReferrerPolicy | null
 }
 
 export interface RequestData extends RequestParams {
@@ -125,12 +125,12 @@ export interface Fetch<
 }
 export type Trans<T extends Record<string, any>, A extends any[], R, E>
 	= E extends DotRequest<T, infer FA, infer FR>
-	? unknown[] extends FA
-	? unknown extends FR
-	? DotRequest<T, A, R>
-	: E
-	: E
-	: E;
+		? unknown[] extends FA
+			? unknown extends FR
+				? DotRequest<T, A, R>
+				: E
+			: E
+		: E;
 
 export type DotRequest<
 	T extends Record<string, any> = {},
@@ -139,8 +139,8 @@ export type DotRequest<
 > = Api<T, A, R> & {
 	[P in Exclude<keyof T, keyof Api<T, A, R>>]:
 	T[P] extends (...a: infer FA) => infer FR
-	? (...a: FA) => Trans<T, A, R, FR>
-	: Trans<T, A, R, T[P]>;
+		? (...a: FA) => Trans<T, A, R, FR>
+		: Trans<T, A, R, T[P]>;
 };
 export interface Api<
 	T extends Record<string, any>,
@@ -273,7 +273,7 @@ export interface Api<
 	 * 设置子资源完整性验证信息
 	 * @param integrity 验证字符串
 	 * @see [子资源完整性(SRI)](https://developer.mozilla.org/zh-CN/docs/Web/Security/Subresource_Integrity)
-	*/
+	 */
 	integrity(integrity: string): this;
 	/** 获取已设置的子资源完整性验证信息 */
 	integrity(): string;
@@ -387,3 +387,12 @@ export interface Api<
 export interface Options<T extends Record<string, any>> {
 	fetch?: Fetch<T> | Fetch<T>[];
 }
+
+const dotRequest = dt;
+interface dotRequest extends Api<{}, [], undefined> {
+	<T extends Record<string, any>>(
+		extend: T & ThisType<DotRequest<T, unknown[], unknown>>,
+		options?: Options<T>
+	): DotRequest<T, [], undefined>;
+}
+export default dotRequest;

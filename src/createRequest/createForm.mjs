@@ -1,6 +1,10 @@
-import getFromData from './getFromData';
-
-export default function createForm(data: Record<string, any>) {
+import getFromData from './getFromData.mjs';
+/**
+ *
+ * @param {Record<string, any>} data
+ * @returns {FormData}
+ */
+export default function createForm(data) {
 	const from = new FormData();
 	for (const [k, v] of Object.entries(data)) {
 		for (const [name, keys, value] of getFromData(k, [], v)) {

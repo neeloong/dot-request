@@ -1,9 +1,13 @@
-export default function* getFromData(
-	main: string,
-	key: string[],
-	value: any,
-	inArray?: boolean,
-): Iterable<[string, string[], true | null | string | Blob]> {
+/**
+ *
+ * @param {string} main
+ * @param {string[]} key
+ * @param {any} value
+ * @param {boolean} [inArray]
+ * @returns {Iterable<[string, string[], true | null | string | Blob]>}
+ * @yields {[string, string[], true | null | string | Blob]}
+ */
+export default function* getFromData(main, key, value, inArray) {
 	if (value === null) {
 		return yield [main, key, null];
 	}

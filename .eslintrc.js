@@ -101,7 +101,7 @@ module.exports = {
 		// 🔧 分号的位置
 		'semi-style': ['error', 'last'],
 		// 🚫 每行最大长度
-		'max-len': ['warn', { code: 80 }],
+		'max-len': ['warn', { code: 80, tabWidth: 2, ignoreComments: true }],
 		// ⛔ 文件的最大行数
 		'max-lines': ['warn', {
 			max: 300,
