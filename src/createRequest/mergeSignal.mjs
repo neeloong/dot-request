@@ -8,12 +8,12 @@ function isAbortSignal(v) {
 }
 /**
  *
- * @param  {...AbortSignal | undefined | null} signals
- * @returns {AbortSignal | undefined}
+ * @param  {...AbortSignal?} signals
+ * @returns {AbortSignal?}
  */
 export default function mergeSignal(...signals) {
 	const list = signals.filter(isAbortSignal);
-	if (!list.length) { return; }
+	if (!list.length) { return null; }
 	if (list.length === 1) { return list[0]; }
 	const controller = new AbortController();
 	Promise.any(list.map(v => {

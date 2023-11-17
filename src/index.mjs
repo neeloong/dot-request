@@ -3,17 +3,27 @@ import createRequest from './createRequest/index.mjs';
 import createSignalMap from './createSignalMap.mjs';
 import result from './result.mjs';
 /**
+ * @typedef {object} RequestDataParams
+ * @property {import('./types.mjs').Sender<any, any, any>?} sender
+ * @property {(request: Request, dotRequest: import('./types.mjs').DotRequest<any, any, any>) => Promise<Response>} fetch
+ * @property {Record<string | symbol, any>} context
+ */
+/**
+ * @typedef {import('./createRequest/index.mjs').RequestParams & RequestDataParams} RequestData
+ */
+
+/**
  * @template {Record<string, any>} T
  * @template {any[]} A
  * @template R
- * @param {import('./types.mjs').RequestData} p
+ * @param {RequestData} p
  * @param {[string | symbol, PropertyDescriptor][]} extend
  * @returns {import('./types.mjs').DotRequest<T, A, R>}
  */
 function create(p, extend) {
 	/**
 	 *
-	 * @param {Partial<import('./types.mjs').RequestData>} np
+	 * @param {Partial<RequestData>} np
 	 * @returns
 	 */
 	function init(np) {
@@ -65,7 +75,7 @@ function create(p, extend) {
 		 * @returns
 		 */
 		redirect(redirect) {
-			if (redirect === undefined) { return p.redirect; }
+			if (!arguments.length) { return p.redirect; }
 			return init({
 				redirect: typeof redirect === 'boolean' ? redirect : 'error',
 			});
@@ -76,47 +86,55 @@ function create(p, extend) {
 		 * @returns
 		 */
 		timeout(t) {
-			if (t === undefined) { return p.timeout || 0; }
+			if (!arguments.length) { return p.timeout || 0; }
 			return init({timeout: typeof t === 'number' && t > 0 ? t : 0});
 		},
+		/**
+		 * @param {RequestCredentials?} [credentials]
+		 */
 		credentials(credentials) {
-			if (credentials === undefined) { return p.credentials || ''; }
-			return init({ credentials: credentials || undefined });
+			if (!arguments.length) { return p.credentials; }
+			return init({
+				credentials: typeof credentials === 'string' && credentials || null,
+			});
 		},
 		/**
-		 * @param {RequestMode} [mode]
+		 * @param {RequestMode?} [mode]
 		 */
 		mode(mode) {
-			if (mode === undefined) { return p.mode || ''; }
-			return init({ mode: typeof mode === 'string' && mode || undefined });
+			if (!arguments.length) { return p.mode || ''; }
+			return init({ mode: typeof mode === 'string' && mode || null });
 		},
 		/**
-		 * @param {RequestCache | ''} [cache]
+		 * @param {RequestCache?} [cache]
 		 */
 		cache(cache) {
-			if (cache === undefined) { return p.cache || ''; }
-			return init({ cache: typeof cache === 'string' && cache || undefined });
+			if (!arguments.length) { return p.cache; }
+			return init({ cache: typeof cache === 'string' && cache || null });
 		},
+		/**
+		 * @param {string} [referrer]
+		 */
 		referrer(referrer) {
-			if (referrer === undefined) { return p.referrer || ''; }
+			if (!arguments.length) { return p.referrer; }
 			return init({
-				referrer: typeof referrer === 'string' && referrer || undefined,
+				referrer: typeof referrer === 'string' ? referrer : '',
 			});
 		},
 		/**
 		 * 设置请求头中 Referrer-Policy
-		 * @param {ReferrerPolicy | ''} rp Referrer-Policy 值
+		 * @param {ReferrerPolicy?} rp Referrer-Policy 值
 		 */
 		referrerPolicy(rp) {
-			if (rp === undefined) { return p.referrerPolicy || ''; }
+			if (!arguments.length) { return p.referrerPolicy; }
 			return init({
-				referrerPolicy: typeof rp === 'string' && rp || undefined,
+				referrerPolicy: typeof rp === 'string' && rp || null,
 			});
 		},
 		integrity(integrity) {
-			if (integrity === undefined) { return p.integrity || ''; }
+			if (!arguments.length) { return p.integrity; }
 			return init({
-				integrity: typeof integrity === 'string' && integrity || undefined,
+				integrity: typeof integrity === 'string' ? integrity : '',
 			});
 		},
 		/**
@@ -151,7 +169,7 @@ function create(p, extend) {
 		/**
 		 *
 		 * @param {*} [body]
-		 * @param {*} [type]
+		 * @param {string} [type]
 		 * @returns
 		 */
 		body(body, type) { return init({ body, type }); },
@@ -161,7 +179,7 @@ function create(p, extend) {
 		signalHandler(handler) {
 			if (typeof handler === 'boolean') {
 				return init({
-					signalHandler: handler ? createSignalMap() : undefined,
+					signalHandler: handler ? createSignalMap() : null,
 				});
 			}
 			return init({ signalHandler: handler });
@@ -189,8 +207,9 @@ function create(p, extend) {
 		 */
 		send(...args) {
 			const { sender } = p;
-			if (typeof sender !== 'function') { return /** @type {*} */(undefined); }
-			return sender(init({ sender: undefined }), ...args);
+			// @ts-ignore
+			if (typeof sender !== 'function') { return; }
+			return sender(init({ sender: null }), ...args);
 		},
 
 		then(fulfilled, rejected) { return fetch().then(fulfilled, rejected); },
@@ -212,20 +231,38 @@ function create(p, extend) {
  * @returns
  */
 function createDotRequest(extend, { fetch: allFetch } = {}) {
-	/** @type {import('./types.mjs').RequestData['fetch']} */
+	/** @type {RequestData['fetch']} */
 	let fetchApi = r => fetch(r);
 	for (const f of [allFetch].flat()) {
 		if (typeof f !== 'function') { continue; }
 		fetchApi = createFetch(f, fetchApi);
 	}
 	return create({
-		context: {},
+		prefix: '',
+		path: '',
 		append: [],
+		suffix: '',
+
+		context: {},
 		headers: {},
 		query: {},
 		params: {},
 		fetch: fetchApi,
 		redirect: true,
+
+		signal: null,
+		signalHandler: null,
+
+		sender: null,
+
+		timeout: 0,
+		integrity: '',
+		keepalive: false,
+		credentials: null,
+		mode: null,
+		cache: null,
+		referrer: '',
+		referrerPolicy: null,
 	}, /** @type {[string | symbol, PropertyDescriptor][]} */(
 		Reflect.ownKeys(extend)
 			.map(k => [k, Reflect.getOwnPropertyDescriptor(extend, k)])

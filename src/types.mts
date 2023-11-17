@@ -8,7 +8,7 @@ export type Signal =
 	| object
 	| boolean | Record<string, any>;
 export interface SignalMap {
-	get(signal: Exclude<Signal, AbortSignal>): AbortController | undefined;
+	get(signal: Exclude<Signal, AbortSignal>): AbortController | void | null;
 	set(signal: Exclude<Signal, AbortSignal>, ac: AbortController): void;
 }
 export type SignalMapToken = number | bigint | string | symbol;
@@ -21,49 +21,9 @@ export type Data =
 	| Record<string, any>;
 
 export interface Sender<T extends Record<string, any>, A extends any[], R> {
-	(request: DotRequest<T, [], undefined>, ...args: A): R;
+	(request: DotRequest<T, [], void>, ...args: A): R;
 }
-export type HeaderValue = number | string | undefined | null;
-export interface RequestParams {
-	method?: string;
-	prefix?: string;
-	path?: string;
-	append: string[];
-	suffix?: string;
-
-	headers: Record<string, HeaderValue | (() => HeaderValue)>;
-
-	params: Record<string, any>;
-	query?: Record<string, any>;
-	search?: string;
-	data?: any;
-	body?: any;
-	type?: any;
-
-	signal?: Signal | boolean;
-	signalHandler?: SignalMapToken | SignalMap | ((v: any) => Signal);
-
-	redirect: boolean | 'error' | 'follow' | 'manual';
-
-	timeout?: number;
-	integrity?: string;
-	keepalive?: boolean;
-	credentials?: '' | RequestCredentials;
-	mode?: '' | RequestMode | null;
-	cache?: '' | RequestCache | null;
-	referrer?: string | null;
-	referrerPolicy?: '' | ReferrerPolicy | null
-}
-
-export interface RequestData extends RequestParams {
-	sender?: Sender<any, any, any>;
-	fetch(
-		request: Request,
-		dotRequest: DotRequest<any, any, any>,
-	): Promise<Response>;
-	context: Record<string | symbol, any>,
-}
-
+export type HeaderValue = number | string | void | null;
 
 export interface Result {
 	readonly version: string;
@@ -86,23 +46,17 @@ export interface Result {
 	/** 对相应按照 Promise.then 的方式处理 */
 	then<TResult1 = Response, TResult2 = never>(
 		onfulfilled?:
-			| ((value: Response) => TResult1 | PromiseLike<TResult1>)
-			| undefined
-			| null,
+			| ((value: Response) => TResult1 | PromiseLike<TResult1>) | null,
 		onrejected?:
-			| ((reason: any) => TResult2 | PromiseLike<TResult2>)
-			| undefined
-			| null
+			| ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,
 	): Promise<TResult1 | TResult2>;
 	/** 对相应按照 Promise.catch 的方式处理 */
 	catch<TResult = never>(
 		onrejected?:
-			| ((reason: any) => TResult | PromiseLike<TResult>)
-			| undefined
-			| null
+			| ((reason: any) => TResult | PromiseLike<TResult>) | null,
 	): Promise<Response | TResult>;
 	/** 对相应按照 Promise.finally 的方式处理 */
-	finally(onfinally?: (() => void) | undefined | null): Promise<Response>;
+	finally(onfinally?: (() => void) | null): Promise<Response>;
 
 	/** 对相应按照类似 Promise.then 的方式处理，但仍返回相应结果 */
 	do(
@@ -142,6 +96,9 @@ export type DotRequest<
 		? (...a: FA) => Trans<T, A, R, FR>
 		: Trans<T, A, R, T[P]>;
 };
+
+export type SignalHandler = SignalMapToken | SignalMap | ((v: any) => Signal);
+
 export interface Api<
 	T extends Record<string, any>,
 	A extends any[],
@@ -238,16 +195,16 @@ export interface Api<
 	 * 设置请求模式
 	 * @param mode 请求模式
 	 */
-	mode(mode: RequestMode): this;
+	mode(mode: RequestMode | null): this;
 	/** 获取设置的请求模式 */
-	mode(): '' | RequestMode;
+	mode(): RequestMode | null;
 	/**
 	 * 设置缓存模式
 	 * @param cache 缓存模式
 	 */
-	cache(cache: '' | RequestCache): this;
+	cache(cache: RequestCache | null): this;
 	/** 获取设置的缓存模式 */
-	cache(): '' | RequestCache;
+	cache(): RequestCache | null;
 	/**
 	 * 指定请求头中 referrer 的模式
 	 * @param referrer referrer 的模式
@@ -259,16 +216,16 @@ export interface Api<
 	 * 设置请求头中 Referrer-Policy
 	 * @param referrer Referrer-Policy 值
 	 */
-	referrerPolicy(referrerPolicy: '' | ReferrerPolicy): this;
+	referrerPolicy(referrerPolicy: ReferrerPolicy | null): this;
 	/** 获取已设置的请求头中 Referrer-Policy */
-	referrerPolicy(): '' | ReferrerPolicy;
+	referrerPolicy(): ReferrerPolicy | null;
 	/**
 	 * 设置浏览器对凭证信息的控制方式
 	 * @param credentials 操作方式
 	 */
-	credentials(credentials: '' | RequestCredentials): this;
+	credentials(credentials: RequestCredentials | null): this;
 	/** 获取已设置浏览器对凭证信息的控制方式 */
-	credentials(): ''  | RequestCredentials;
+	credentials(): RequestCredentials | null;
 	/**
 	 * 设置子资源完整性验证信息
 	 * @param integrity 验证字符串
@@ -331,9 +288,7 @@ export interface Api<
 	/** 设置中断信号 */
 	signal(signal?: Signal): this;
 	/** 设置中断信号处理函数 */
-	signalHandler(
-		handler?: SignalMapToken | SignalMap | ((v: any) => Signal) | boolean,
-	): this;
+	signalHandler(handler?: SignalHandler | boolean): this;
 
 	/** 设置请求方法 */
 	interface(fetch: Fetch<T>): this;
@@ -364,35 +319,27 @@ export interface Api<
 	/** 发送请求并获取相应，并按照 Promise.then 的方式处理 */
 	then<TResult1 = Response, TResult2 = never>(
 		onfulfilled?:
-			| ((value: Response) => TResult1 | PromiseLike<TResult1>)
-			| undefined
-			| null,
+			| ((value: Response) => TResult1 | PromiseLike<TResult1>) | null,
 		onrejected?:
-			| ((reason: any) => TResult2 | PromiseLike<TResult2>)
-			| undefined
-			| null,
+			| ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,
 	): Promise<TResult1 | TResult2>;
 	/** 发送请求并获取相应，并按照 Promise.catch 的方式处理 */
 	catch<TResult = never>(
 		onrejected?:
-			| ((reason: any) => TResult | PromiseLike<TResult>)
-			| undefined
-			| null,
+			| ((reason: any) => TResult | PromiseLike<TResult>) | null,
 	): Promise<Response | TResult>;
 	/** 发送请求并获取相应，并按照 Promise.finally 的方式处理 */
-	finally(
-		onfinally?: (() => void) | undefined | null,
-	): Promise<Response>;
+	finally(onfinally?: (() => void) | null): Promise<Response>;
 }
 export interface Options<T extends Record<string, any>> {
 	fetch?: Fetch<T> | Fetch<T>[];
 }
 
 const dotRequest = dt;
-interface dotRequest extends Api<{}, [], undefined> {
+interface dotRequest extends Api<{}, [], void> {
 	<T extends Record<string, any>>(
 		extend: T & ThisType<DotRequest<T, unknown[], unknown>>,
 		options?: Options<T>
-	): DotRequest<T, [], undefined>;
+	): DotRequest<T, [], void>;
 }
 export default dotRequest;

@@ -55,10 +55,10 @@ function createReplace(params) {
 const regex = /^([^?#]*)((?:\?[^#]*)?)((?:#[\s\S]*)?)$/;
 /**
  *
- * @param {string | undefined} prefix
- * @param {string | undefined} path
+ * @param {string} prefix
+ * @param {string} path
  * @param {string[]} append
- * @param {string | undefined} suffix
+ * @param {string} suffix
  * @param {Record<string, any>} [params]
  * @param {*} [query]
  * @param {*} [search]

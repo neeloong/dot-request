@@ -4,8 +4,41 @@ import createHeaders from './createHeaders.mjs';
 import createForm from './createForm.mjs';
 import mergeSignal from './mergeSignal.mjs';
 /**
+ * @typedef {object} RequestParams
+ * @property {string} [method]
+ * @property {string} prefix
+ * @property {string} path
+ * @property {string[]} append
+ * @property {string} suffix
  *
- * @param {import('../types.mjs').RequestParams} params
+ * @property {Record<string, import('../types.mjs').HeaderValue | (() => import('../types.mjs').HeaderValue)>} headers
+ *
+ * @property {Record<string, any>} params
+ * @property {Record<string, any>} [query]
+ * @property {string} [search]
+ * @property {any} [data]
+ * @property {any} [body]
+ * @property {string | boolean} [type]
+ *
+ * @property {import('../types.mjs').Signal | boolean | null} signal
+ * @property {import('../types.mjs').SignalHandler?} signalHandler
+ *
+ * @property {boolean | 'error' | 'follow' | 'manual'} redirect
+ *
+ * @property {number} timeout
+ * @property {string} integrity
+ * @property {boolean} keepalive
+ * @property {RequestCredentials | null} credentials
+ * @property {RequestMode | null} mode
+ * @property {RequestCache | null} cache
+ * @property {string} referrer
+ * @property {ReferrerPolicy | null} referrerPolicy
+ */
+
+
+/**
+ *
+ * @param {RequestParams} params
  * @returns {Request}
  */
 export default function createRequest({
@@ -83,7 +116,7 @@ export default function createRequest({
 		params,
 		query,
 		search,
-		dataInPath ? data : undefined,
+		dataInPath ? data : null,
 	);
 	return new Request(fullPath, init);
 

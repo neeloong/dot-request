@@ -14,11 +14,11 @@ const abortTokens = createSignalMap();
  *
  * @param {import('../types.mjs').SignalMap} tokens
  * @param {*} [signal]
- * @returns {AbortSignal | undefined}
+ * @returns {AbortSignal?}
  */
 function toSignal(tokens, signal) {
-	if (!types.has(typeof signal)) { return; }
-	if (signal === null || signal === false) { return; }
+	if (!types.has(typeof signal)) { return null; }
+	if (signal === null || signal === false) { return null; }
 	tokens.get(signal)?.abort();
 	const ac = new AbortController();
 	tokens.set(signal, ac);
@@ -57,16 +57,16 @@ function toSignalMap(handler) {
 }
 /**
  *
- * @param {import('../types.mjs').Signal} [signal]
- * @param {import('../types.mjs').SignalMap | import('../types.mjs').SignalMapToken | ((v: any) => import('../types.mjs').Signal)} [handler]
- * @returns
+ * @param {import('../types.mjs').Signal?} signal
+ * @param {import('../types.mjs').SignalHandler?} handler
+ * @returns {AbortSignal?}
  */
 export default function getSignal(
 	signal,
 	handler,
 ) {
 	if (signal instanceof AbortSignal) { return signal; }
-	if (signal === null || signal === undefined || signal === false) { return; }
+	if ((signal ?? null) === null || signal === false) { return null; }
 	if (typeof handler === 'function') {
 		const s = handler(signal);
 		if (s instanceof AbortSignal) { return s; }
