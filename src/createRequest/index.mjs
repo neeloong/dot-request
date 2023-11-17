@@ -3,6 +3,7 @@ import getPath from './getPath.mjs';
 import createHeaders from './createHeaders.mjs';
 import createForm from './createForm.mjs';
 import mergeSignal from './mergeSignal.mjs';
+import StatisticsStream from '../StatisticsStream.mjs';
 /**
  * @typedef {object} RequestParams
  * @property {string} [method]
@@ -33,6 +34,7 @@ import mergeSignal from './mergeSignal.mjs';
  * @property {RequestCache | null} cache
  * @property {string} referrer
  * @property {ReferrerPolicy | null} referrerPolicy
+ * @property {import('../types.mjs').ProgressListener?} uploadProgress
  */
 
 
@@ -47,6 +49,8 @@ export default function createRequest({
 	params, query, search, data, body, type,
 	signal, signalHandler,
 	headers: baseHeaders,
+
+	uploadProgress,
 
 	timeout,
 	integrity, keepalive, credentials, mode, cache, referrer, referrerPolicy,
@@ -70,6 +74,8 @@ export default function createRequest({
 	if (referrerPolicy) { init.referrerPolicy = referrerPolicy; }
 	if (integrity) { init.integrity = integrity; }
 
+	let total = -1;
+
 	if (method !== 'get' && method !== 'head') {
 		if (body instanceof FormData) {
 			init.body = body;
@@ -80,17 +86,26 @@ export default function createRequest({
 			} else if (bType) {
 				headers['Content-Type'] = bType;
 			}
+			total = body.size;
 			init.body = body;
-		} else if (
-			body instanceof ReadableStream
-			|| body instanceof ArrayBuffer
-			|| ArrayBuffer.isView(body)
-			|| body && typeof body === 'string'
-		) {
+		} else if (body instanceof ReadableStream) {
 			if (type && typeof type === 'string') {
 				headers['Content-Type'] = type;
 			}
 			init.body = body;
+		} else if (body instanceof ArrayBuffer || ArrayBuffer.isView(body)) {
+			if (type && typeof type === 'string') {
+				headers['Content-Type'] = type;
+			}
+			total = body.byteLength;
+			init.body = body;
+		} else if (body && typeof body === 'string') {
+			if (type && typeof type === 'string') {
+				headers['Content-Type'] = type;
+			}
+			const blob = new Blob([body]);
+			total = blob.size;
+			init.body = blob;
 		} else if (body) {
 			if (
 				type === true
@@ -100,11 +115,15 @@ export default function createRequest({
 				init.body = createForm(body);
 			} else {
 				headers['Content-Type'] = 'application/json';
-				init.body = JSON.stringify(body);
+				const blob = new Blob([JSON.stringify(body)]);
+				total = blob.size;
+				init.body = blob;
 			}
 		} else if (data) {
 			headers['Content-Type'] = 'application/json';
-			init.body = JSON.stringify(body);
+			const blob = new Blob([JSON.stringify(data)]);
+			total = blob.size;
+			init.body = blob;
 		}
 	}
 	const dataInPath = body || ['get', 'head'].includes(method.toLowerCase());
@@ -118,6 +137,15 @@ export default function createRequest({
 		search,
 		dataInPath ? data : null,
 	);
-	return new Request(fullPath, init);
-
+	const request = new Request(fullPath, init);
+	if (!uploadProgress) { return request; }
+	const requestBody = request.body;
+	if (!requestBody) {
+		return request;
+	}
+	return new Request(request, {
+		body: requestBody.pipeThrough(new StatisticsStream(progress => {
+			uploadProgress(progress, total);
+		})),
+	});
 }

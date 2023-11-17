@@ -25,6 +25,7 @@ export interface Sender<T extends Record<string, any>, A extends any[], R> {
 }
 export type HeaderValue = number | string | void | null;
 
+export type ProgressListener = (progress: number, total: number) => void;
 export interface Result {
 	readonly version: string;
 	/** 获取文本格式的相应体 */
@@ -63,6 +64,8 @@ export interface Result {
 		handler?: ((v: Response) => any) | null,
 		catcher?: ((v: any) => any) | null,
 	): Result;
+	/** 设置下载进度监听 */
+	downloadProgress(downloadProgress: ProgressListener): Result;
 }
 
 export interface Fetch<
@@ -292,6 +295,10 @@ export interface Api<
 
 	/** 设置请求方法 */
 	interface(fetch: Fetch<T>): this;
+	/** 设置上传进度监听 */
+	uploadProgress(uploadProgress: ProgressListener | null): this;
+	/** 设置下载进度监听 */
+	downloadProgress(downloadProgress: ProgressListener | null): this;
 
 	/** 创建对应的 Request 对象 */
 	create(): Request;

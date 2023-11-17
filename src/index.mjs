@@ -7,6 +7,7 @@ import result from './result.mjs';
  * @property {import('./types.mjs').Sender<any, any, any>?} sender
  * @property {(request: Request, dotRequest: import('./types.mjs').DotRequest<any, any, any>) => Promise<Response>} fetch
  * @property {Record<string | symbol, any>} context
+ * @property {import('./types.mjs').ProgressListener?} downloadProgress
  */
 /**
  * @typedef {import('./createRequest/index.mjs').RequestParams & RequestDataParams} RequestData
@@ -33,7 +34,10 @@ function create(p, extend) {
 	function fetch() {
 		const dotRequest = create(p, extend);
 		const response = p.fetch(createRequest(p), dotRequest);
-		return result(response);
+		const res = result(response);
+		const dp = p.downloadProgress;
+		if (!dp) { return res; }
+		return res.downloadProgress(dp);
 	}
 	/**
 	 *
@@ -188,8 +192,12 @@ function create(p, extend) {
 		interface(fetch) {
 			return init({ fetch: createFetch(fetch, p.fetch) });
 		},
-
-
+		uploadProgress(up) {
+			return init({ uploadProgress: typeof up === 'function' ? up : null });
+		},
+		downloadProgress(dp) {
+			return init({ downloadProgress: typeof dp === 'function' ? dp : null });
+		},
 		create() { return createRequest(p); },
 		fetch,
 
@@ -263,6 +271,9 @@ function createDotRequest(extend, { fetch: allFetch } = {}) {
 		cache: null,
 		referrer: '',
 		referrerPolicy: null,
+
+		uploadProgress: null,
+		downloadProgress: null,
 	}, /** @type {[string | symbol, PropertyDescriptor][]} */(
 		Reflect.ownKeys(extend)
 			.map(k => [k, Reflect.getOwnPropertyDescriptor(extend, k)])

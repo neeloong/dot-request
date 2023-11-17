@@ -1,3 +1,5 @@
+import StatisticsStream from './StatisticsStream.mjs';
+
 /**
  *
  * @param {Promise<Response>} response
@@ -32,6 +34,16 @@ export default function result(response) {
 					await catcher(e);
 				}
 				throw e;
+			}));
+		},
+		downloadProgress(dp) {
+			return result(response.then(r => {
+				const totalN = Number(r.headers.get('Context-Length'));
+				const total = totalN >= 0 ? totalN : -1;
+				return new Response(
+					r.body?.pipeThrough(new StatisticsStream(p => dp(p, total))),
+					r,
+				);
 			}));
 		},
 	};
