@@ -38,6 +38,8 @@ export interface Result {
 	formData(): Promise<FormData>;
 	/** 获取 JSON 格式的相应体 */
 	json<T>(): Promise<T>;
+	/** 获取相应流 */
+	stream(): Promise<ReadableStream<Uint8Array> | null>;
 
 	/** 获取状态码在 200-299 的相应结果 */
 	ok(): Result;
@@ -317,6 +319,8 @@ export interface Api<
 	formData(): Promise<FormData>;
 	/** 发送请求，并获取 JSON 格式的相应体 */
 	json<T>(): Promise<T>;
+	/** 发送请求，并获取相应流 */
+	stream(): Promise<ReadableStream<Uint8Array> | null>;
 
 	/** 设置发送处理函数，以供 send 方法使用 */
 	sender<A extends any[], R>(sender: Sender<T, A, R>): DotRequest<T, A, R>;

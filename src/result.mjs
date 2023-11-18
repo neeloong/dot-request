@@ -13,6 +13,7 @@ export default function result(response) {
 		arrayBuffer() { return response.then(r => r.arrayBuffer()); },
 		formData() { return response.then(r => r.formData()); },
 		json() { return response.then(r => r.json()); },
+		stream() { return response.then(r => r.body); },
 
 		ok() {
 			return result(response.then( v =>v.ok ? v : Promise.reject(v)));

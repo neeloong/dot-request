@@ -207,6 +207,7 @@ function create(p, extend) {
 		arrayBuffer() { return fetch().ok().arrayBuffer(); },
 		formData() { return fetch().ok().formData(); },
 		json() { return fetch().ok().json(); },
+		stream() { return fetch().ok().stream(); },
 		sender(sender) { return init({ sender }); },
 		/**
 		 *
