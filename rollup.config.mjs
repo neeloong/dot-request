@@ -13,10 +13,10 @@ const year = new Date().getFullYear();
 
 const banner = `\
 /*!
-* ${name} v${version}
-* (c) ${beginYear === year ? beginYear : `${beginYear}-${year}`} ${author}
-* @license ${license}
-*/
+ * ${name} v${version}
+ * (c) ${beginYear === year ? beginYear : `${beginYear}-${year}`} ${author}
+ * @license ${license}
+ */
 `;
 
 
@@ -64,7 +64,14 @@ export default [
 				extensions: ['.ts'],
 				plugins: ['@babel/plugin-transform-typescript'],
 			}),
-			replace({ preventAssignment: true, values: {__VERSION__: version} }),
+			replace({ preventAssignment: true, values: {
+				__VERSION__: version,
+				[`import('./types.mjs').`]: '',
+				[`import('../types.mjs').`]: '',
+				[`import('./index.mjs').`]: '',
+				[`import('./create.mjs').`]: '',
+				[`import('./createRequest/index.mjs').`]: '',
+			} }),
 		],
 	}, {
 		input: 'src/types.mts',
