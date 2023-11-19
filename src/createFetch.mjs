@@ -2,8 +2,8 @@
 /**
  * @template {Record<string, any>} T
  * @param {import('./types.mjs').Fetch<T>} fetchApi
- * @param {import('./index.mjs').RequestData['fetch']} oldFetch
- * @returns {import('./index.mjs').RequestData['fetch']}
+ * @param {import('./create.mjs').RequestData['fetch']} oldFetch
+ * @returns {import('./create.mjs').RequestData['fetch']}
  */
 export default function createFetch(fetchApi, oldFetch) {
 	return async function (request, dotRequest) {

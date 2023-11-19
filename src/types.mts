@@ -13,12 +13,17 @@ export interface SignalMap {
 }
 export type SignalMapToken = number | bigint | string | symbol;
 
-export type Data =
+export type BodyData =
 	| FormData
 	| ArrayBuffer
 	| ArrayBufferView
 	| object
-	| Record<string, any>;
+	| Record<string, any>
+	| ReadableStream
+	| Blob
+	| BufferSource
+	| URLSearchParams
+	| string;
 
 export interface Sender<T extends Record<string, any>, A extends any[], R> {
 	(request: DotRequest<T, [], void>, ...args: A): R;
@@ -272,19 +277,7 @@ export interface Api<
 	/** 设置请求数据 */
 	data(data?: Record<string, any>): this;
 	/** 设置请求身体 */
-	body(
-		body?:
-			| ReadableStream
-			| FormData
-			| Blob
-			| BufferSource
-			| FormData
-			| URLSearchParams
-			| string
-			| ArrayBuffer
-			| ArrayBufferView,
-		type?: string,
-	): this;
+	body(body?: BodyData, type?: string): this;
 	/** 设置请求身体 */
 	body(body?: object | Record<string, any>): this;
 	/** 设置请求身体 */
