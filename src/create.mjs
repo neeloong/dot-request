@@ -495,10 +495,21 @@ export default function create(p, extend) {
 		 */
 		json() { return fetch().ok().json(); },
 		/**
+		 * 发送请求，并获取 UrlSearchParams 格式的相应体
+		 * @returns {Promise<URLSearchParams>}
+		 */
+		searchParams() { return fetch().ok().searchParams(); },
+		/**
 		 * 发送请求，并获取相应流
 		 * @returns {Promise<ReadableStream<Uint8Array> | null>}
 		 */
 		stream() { return fetch().ok().stream(); },
+		/**
+		 * 发送请求，并根据 Content-Type 相应头获取对应格式的相应体
+		 * @template T
+		 * @returns {Promise<T | null>}
+		 */
+		result() { return fetch().ok().result(); },
 		/**
 		 * 设置发送处理函数，以供 send 方法使用
 		 * @template {any[]} A

@@ -43,8 +43,12 @@ export interface Result {
 	formData(): Promise<FormData>;
 	/** 获取 JSON 格式的相应体 */
 	json<T>(): Promise<T>;
+	/** 获取 UrlSearchParams 格式的相应体 */
+	searchParams(): Promise<URLSearchParams>;
 	/** 获取相应流 */
 	stream(): Promise<ReadableStream<Uint8Array> | null>;
+	/** 根据 Content-Type 相应头获取对应格式的相应体 */
+	result<T>(): Promise<T | null>;
 
 	/** 获取状态码在 200-299 的相应结果 */
 	ok(): Result;
@@ -310,10 +314,14 @@ export interface Api<
 	arrayBuffer(): Promise<ArrayBuffer>;
 	/** 发送请求，并获取 FormData 格式的相应体 */
 	formData(): Promise<FormData>;
+	/** 发送请求，并获取 UrlSearchParams 格式的相应体 */
+	searchParams(): Promise<URLSearchParams>;
 	/** 发送请求，并获取 JSON 格式的相应体 */
 	json<T>(): Promise<T>;
 	/** 发送请求，并获取相应流 */
 	stream(): Promise<ReadableStream<Uint8Array> | null>;
+	/** 发送请求，并根据 Content-Type 相应头获取对应格式的相应体 */
+	result<T>(): Promise<T | null>;
 
 	/** 设置发送处理函数，以供 send 方法使用 */
 	sender<A extends any[], R>(sender: Sender<T, A, R>): DotRequest<T, A, R>;

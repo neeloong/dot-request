@@ -35,10 +35,43 @@ export default function result(response) {
 		 */
 		json() { return response.then(r => r.json()); },
 		/**
+		 * 获取 UrlSearchParams 格式的相应体
+		 * @returns {Promise<URLSearchParams>}
+		 */
+		searchParams() {
+			return response.then(r => r.text())
+				.then(t => new URLSearchParams(t));
+		},
+		/**
 		 * 获取相应流
 		 * @returns {Promise<ReadableStream<Uint8Array> | null>}
 		 */
 		stream() { return response.then(r => r.body); },
+		/**
+		 * 根据 Content-Type 相应头获取对应格式的相应体
+		 * @template T
+		 * @returns {Promise<T | null>}
+		 */
+		result() {
+			return response.then(r => {
+				const type = r.headers.get('content-type');
+				if (!type) { return null; }
+				const [mime] = type.replace(/\s/g, '').split(';', 1);
+				if (mime === 'multipart/form-data') {
+					return r.formData();
+				}
+				if (mime === 'text/plain') {
+					return r.text();
+				}
+				if (mime === 'application/json' || mime === 'text/json') {
+					return r.json();
+				}
+				if (mime === 'application/x-www-form-urlencoded') {
+					return r.text().then(t => new URLSearchParams(t));
+				}
+
+			});
+		},
 
 		/**
 		 * 获取状态码在 200-299 的相应结果
