@@ -2,6 +2,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
 import dts from 'rollup-plugin-dts';
 import replace from '@rollup/plugin-replace';
+import terser from '@rollup/plugin-terser';
 import fsPromise from 'node:fs/promises';
 const info = JSON.parse(await fsPromise.readFile('./package.json', 'utf-8'));
 const {
@@ -31,7 +32,7 @@ await fsPromise.writeFile(`dist/package.json`, JSON.stringify({
 	author, license, homepage, repository, bugs,
 	exports: {
 		'.': {
-			type: './index.d.js',
+			types: './index.d.ts',
 			node: './index.cjs',
 			module: './index.mjs',
 			unpkg: './index.js',
@@ -40,13 +41,14 @@ await fsPromise.writeFile(`dist/package.json`, JSON.stringify({
 	},
 }, null, 2));
 
-function createOutput(format, ext) {
+function createOutput(format, ext, min) {
 	return {
 		format,
-		file: `dist/index.${ext}`,
+		file: `dist/index${min ? '.min' : ''}.${ext}`,
 		name: name.replace(/-([a-z])/g, (_, v) => v.toUpperCase()),
 		banner,
 		exports: 'default',
+		plugins: min ? [terser()] : [],
 	};
 }
 
@@ -57,6 +59,8 @@ export default [
 			createOutput('esm', 'mjs'),
 			createOutput('cjs', 'cjs'),
 			createOutput('umd', 'js'),
+			createOutput('esm', 'mjs', true),
+			createOutput('umd', 'js', true),
 		],
 		plugins: [
 			resolve({ extensions: ['.ts'] }),
