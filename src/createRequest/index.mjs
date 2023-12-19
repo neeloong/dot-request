@@ -79,6 +79,11 @@ export default function createRequest({
 	if (method !== 'get' && method !== 'head') {
 		if (body instanceof FormData) {
 			init.body = body;
+		} else if (body instanceof URLSearchParams) {
+			headers['Content-Type'] = 'application/x-www-form-urlencoded';
+			const blob = new Blob([body.toString()]);
+			total = blob.size;
+			init.body = blob;
 		} else if (body instanceof Blob) {
 			const bType = body.type;
 			if (type && typeof type === 'string') {

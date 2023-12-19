@@ -14,9 +14,12 @@ function getKey(name, keys) {
 /**
  *
  * @param {*} query
- * @returns
+ * @returns {string[]}
  */
 function queryStringify(query) {
+	if (query instanceof URLSearchParams) {
+		return [query.toString()];
+	}
 	/** @type {string[]} */
 	const text = [];
 	if (!query) { return text; }
