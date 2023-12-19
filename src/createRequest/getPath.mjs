@@ -83,7 +83,7 @@ export default function getPath(
 	let p = paths.map(([, v]) => v)
 		.map(createReplace(params))
 		.join('/')
-		.replace(/((?:^(?:http|ftp)s?:\/)?)[\\/]+/ig, '$0/');
+		.replace(/((?:^(?:http|ftp)s?:\/)?)[\\/]+/ig, '$1/');
 	if (p[0] !== '/' && !/^(http|ftp)s?:\/\//i.test(p)) {
 		p = `/${p}`;
 	}
