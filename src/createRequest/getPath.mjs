@@ -61,7 +61,7 @@ const regex = /^([^?#]*)((?:\?[^#]*)?)((?:#[\s\S]*)?)$/;
  * @param {string} suffix
  * @param {Record<string, any>} [params]
  * @param {*} [query]
- * @param {*} [search]
+ * @param {string} [search]
  * @param {*} [data]
  * @returns
  */
@@ -89,7 +89,7 @@ export default function getPath(
 	}
 	const allSearch = [
 		...paths.map(([, , s]) => s.substring(1)),
-		search[0] === '?' ? search.substring(1) : search,
+		search?.[0] === '?' ? search.substring(1) : search,
 		...queryStringify(query),
 		...queryStringify(data),
 	].filter(Boolean).join('&');
