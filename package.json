@@ -3,7 +3,7 @@
   "version": "0.3.2",
   "description": "链式调用 fetch() 或创建 Request 对象",
   "scripts": {
-    "build": "rollup -c && cp README.* LICENSE dist"
+    "build": "tsc -p tsconfig.json && node build.mjs"
   },
   "author": "猛火 Fierflame",
   "license": "MIT",
@@ -16,17 +16,13 @@
   },
   "homepage": "https://gitee.com/fierflame/dot-request#git-readme",
   "devDependencies": {
-    "@babel/core": "^7.20.12",
-    "@babel/plugin-transform-typescript": "^7.20.7",
-    "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^20.11.30",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
     "eslint": "^8.32.0",
-    "rollup": "^3.10.0",
-    "rollup-plugin-dts": "^5.1.1",
-    "typescript": "^4.9.4"
+    "rollup": "^4.14.3",
+    "typescript": "^5.4.5"
   }
 }
