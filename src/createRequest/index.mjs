@@ -55,7 +55,6 @@ export default function createRequest({
 	timeout,
 	integrity, keepalive, credentials, mode, cache, referrer, referrerPolicy,
 }) {
-	/** @type {HeadersInit} */
 	const headers = createHeaders(baseHeaders);
 	/** @type {RequestInit} */
 	const init = {
