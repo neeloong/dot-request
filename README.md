@@ -34,21 +34,21 @@ const dr = new DotRequest()
 	.header(`X-Token`, () => getToken()) // 在创建请求时，请求头 X-Token 设置为创建时 getToken() 的返回值
 
 // 发送请求 GET /api/users/10000.json 并获取以 json 格式解析的相应内容
-const userJson = await dr.get('/users/:uid').param({uid: 10000}).json();
+const userJson = await dr.get('/users/:uid').params({uid: 10000}).json();
 // 发送请求 GET /api/users/10000.json 并获取对应的 Response 对象
-const userResponse = await dr.get('/users/:uid').param({uid: 10000});
+const userResponse = await dr.get('/users/:uid').params({uid: 10000});
 
 // 发送请求 GET /api/users/10000.json 并获取以 json 格式解析的相应内容，但设置了 1s 的超时时间
-const userJsonTimeout = await dr.get('/users/:uid').param({uid: 10000}).timeout(1000).json();
+const userJsonTimeout = await dr.get('/users/:uid').params({uid: 10000}).timeout(1000).json();
 // 发送请求 GET /api/users/10000.json 并获取对应的 Response 对象，但设置了 1s 的超时时间
-const userResponseTimeout = await dr.get('/users/:uid').param({uid: 10000}).timeout(1000);
+const userResponseTimeout = await dr.get('/users/:uid').params({uid: 10000}).timeout(1000);
 
 // 发送请求 GET /api/users/10000.json 并获取对应的 DotRequest.Result 对象
-const userResult = dr.get('/users/:uid').param({uid: 10000}).fetch();
+const userResult = dr.get('/users/:uid').params({uid: 10000}).fetch();
 // 获取以 json 格式解析的 userResult 内容
 const userResultJson = await userResult.json();
 
 // 创建 GET /api/users/10000.json 的 Request 对象
-const request = dr.get('/users/:uid').param({uid: 10000}).create();
+const request = dr.get('/users/:uid').params({uid: 10000}).create();
 
 ```
