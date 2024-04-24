@@ -78,10 +78,15 @@ export class Result {
 
 	/**
 	 * 获取状态码在 200-299 的相应结果
+	 * @param {import('./types.mjs').ErrorHandler?} [error]
 	 * @returns {Result}
 	 */
-	ok() {
-		return new Result(this.#response.then(v => v.ok ? v : Promise.reject(v)));
+	ok(error) {
+		return new Result(this.#response.then(v => {
+			if (v.ok) { return v; }
+			if (typeof error !== 'function') { return Promise.reject(v); }
+			return Promise.resolve(error(v)).then(v => Promise.reject(v));
+		}));
 	}
 	/**
 	 * 复制相应结果

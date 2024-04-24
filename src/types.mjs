@@ -26,6 +26,11 @@
  * @param {number} total
  * @returns {void}
  */
+/**
+ * @callback ErrorHandler
+ * @param {Response} response
+ * @returns {unknown | Promise<unknown>}
+ */
 
 /**
  * @callback Fetch

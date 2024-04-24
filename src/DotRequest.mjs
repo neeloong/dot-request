@@ -56,6 +56,8 @@ class DotRequest {
 	#context = {};
 	/** @type {import('./types.mjs').ProgressListener?} */
 	#downloadProgress = null;
+	/** @type {import('./types.mjs').ErrorHandler?} */
+	#errorHandler = null;
 	get version() { return '__VERSION__'; }
 	/**
 	 * @returns {DotRequest}
@@ -85,6 +87,7 @@ class DotRequest {
 			api.#fetch = this.#fetch;
 			api.#context = this.#context;
 			api.#downloadProgress = this.#downloadProgress;
+			api.#errorHandler = this.#errorHandler;
 		}
 		// @ts-ignore
 		return api;
@@ -519,12 +522,22 @@ class DotRequest {
 	}
 	/**
 	 * 设置下载进度监听
-	 * @param {import('./types.mjs').ProgressListener} dp
+	 * @param {import('./types.mjs').ProgressListener?} dp
 	 * @returns {ReturnType<this['build']>}
 	 */
 	downloadProgress(dp) {
 		const api = this.clone();
 		api.#downloadProgress = typeof dp === 'function' ? dp : null;
+		return api;
+	}
+	/**
+	 * 设置异常相应处理函数
+	 * @param {import('./types.mjs').ErrorHandler?} eh
+	 * @returns {ReturnType<this['build']>}
+	 */
+	errorHandler(eh) {
+		const api = this.clone();
+		api.#errorHandler = typeof eh === 'function' ? eh : null;
 		return api;
 	}
 	/**
@@ -539,17 +552,20 @@ class DotRequest {
 	fetch() {
 		const dotRequest = this.clone();
 		const response = this.#fetch(this.create(), dotRequest);
-		const res = new Result(response);
+		let res = new Result(response);
 		const dp = this.#downloadProgress;
-		if (!dp) { return res; }
-		return res.downloadProgress(dp);
+		if (dp) { res = res.downloadProgress(dp); }
+		const eh = this.#errorHandler;
+		if (eh) { res = res.ok(eh); }
+		return res;
 	}
 
 	/**
 	 * 发送请求，并获取状态码在 200-299 的相应结果
+	 * @param {import('./types.mjs').ErrorHandler?} [error]
 	 * @returns {import('./Result.mjs').Result}
 	 */
-	ok() { return this.fetch().ok(); }
+	ok(error) { return this.fetch().ok(error); }
 	/**
 	 * 发送请求，并获取文本格式的相应体
 	 * @returns {Promise<string>}
