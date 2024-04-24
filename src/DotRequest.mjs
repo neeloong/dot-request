@@ -608,6 +608,23 @@ class DotRequest {
 	 * @returns {Promise<T | null>}
 	 */
 	result() { return this.fetch().ok().result(); }
+	/**
+	 * 发送请求，并返回自定义结果
+	 * @template [T=void]
+	 * @overload
+	 * @param {T} value
+	 * @returns {Promise<T>}
+	 */
+	/**
+	 * 发送请求，但不返回结果
+	 * @overload
+	 * @returns {Promise<void>}
+	 */
+	/**
+	 * @param {unknown} [value]
+	 * @returns {Promise<unknown>}
+	 */
+	done(value) { return this.fetch().ok().done(value); }
 
 	/**
 	 * 发送请求并获取相应，并按照 Promise.then 的方式处理

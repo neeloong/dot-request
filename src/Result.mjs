@@ -75,6 +75,25 @@ export class Result {
 
 		});
 	}
+	/**
+	 * 返回自定义结果
+	 * @template [T=void]
+	 * @overload
+	 * @param {T} value
+	 * @returns {Promise<T>}
+	 */
+	/**
+	 * 结束但不返回结果
+	 * @overload
+	 * @returns {Promise<void>}
+	 */
+	/**
+	 * @param {unknown} [value]
+	 * @returns {Promise<unknown>}
+	 */
+	done(value) {
+		return this.#response.then(() => value);
+	}
 
 	/**
 	 * 获取状态码在 200-299 的相应结果
