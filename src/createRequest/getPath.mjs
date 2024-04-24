@@ -48,11 +48,11 @@ function queryStringify(query) {
 function createReplace(params) {
 	if (params) {
 		return p => p.replace(
-			/:([a-zA-Z0-9][a-z0-9]*)/g,
+			/:([a-zA-Z0-9][a-zA-Z0-9]*)/g,
 			(_, k) => k && k in params ? encodeURIComponent(params[k]) : '',
 		);
 	}
-	return p => p.replace(/:([a-zA-Z0-9][a-z0-9]*)/g, '');
+	return p => p.replace(/:([a-zA-Z0-9][a-zA-Z0-9]*)/g, '');
 }
 
 const regex = /^([^?#]*)((?:\?[^#]*)?)((?:#[\s\S]*)?)$/;
