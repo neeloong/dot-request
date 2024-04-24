@@ -1,4 +1,5 @@
 export default {
+	files: ['src/**/*.mjs'],
 	rules: {
 		// eslint 内置规则，详情见 `https://eslint.org/docs/latest/rules/*`
 		strict: ['error', 'never'],
