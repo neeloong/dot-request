@@ -502,14 +502,11 @@ class DotRequest {
 
 	/**
 	 * 设置请求方法
+	 * @deprecated 请用 `dr.fetch(fetch)` 代替
 	 * @param {import('./types.mjs').Fetch} fetch
 	 * @returns {ReturnType<this['build']>}
 	 */
-	interface(fetch) {
-		const api = this.clone();
-		api.#fetch = createFetch(fetch, this.#fetch);
-		return api;
-	}
+	interface(fetch) { return this.fetch(fetch); }
 	/**
 	 * 设置上传进度监听
 	 * @param {import('./types.mjs').ProgressListener} up
@@ -546,10 +543,26 @@ class DotRequest {
 		*/
 	create() { return createRequest(this.#options); }
 	/**
+	 * 设置请求方法
+	 * @overload
+	 * @param {import('./types.mjs').Fetch} fetch
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
 	 * 发送请求并获取相应结果
+	 * @overload
 	 * @returns {import('./Result.mjs').Result}
 	 */
-	fetch() {
+	/**
+	 * @param {import('./types.mjs').Fetch} [fetch]
+	 * @returns {import('./Result.mjs').Result | ReturnType<this['build']>}
+	 */
+	fetch(fetch) {
+		if (typeof fetch === 'function') {
+			const api = this.clone();
+			api.#fetch = createFetch(fetch, this.#fetch);
+			return api;
+		}
 		const dotRequest = this.clone();
 		const response = this.#fetch(this.create(), dotRequest);
 		let res = new Result(response);
