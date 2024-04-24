@@ -1,48 +1,5 @@
-module.exports = {
-	env: {
-		es6: true,
-		browser: true,
-	},
-	parser: '@typescript-eslint/parser',
-	parserOptions: {
-		sourceType: 'module',
-		allowImportExportEverywhere: false,
-	},
-	plugins: ['@typescript-eslint'],
+export default {
 	rules: {
-		// @typescript-eslint 插件的规则，详情见 https://typescript-eslint.io/rules/*
-		// 定义之前不要使用
-		'@typescript-eslint/no-use-before-define': 'warn',
-		// 🔧 调用函数时，括号前的空格
-		'@typescript-eslint/func-call-spacing': ['error', 'never'],
-		// 🚫 禁止重复的类成员
-		'@typescript-eslint/no-dupe-class-members': 'error',
-		// 🔧 是否分号
-		'@typescript-eslint/semi': ['error', 'always'],
-		// ✅🔧 统一缩进
-		'@typescript-eslint/indent': ['error', 'tab', {
-			'ignoredNodes': ['TSUnionType'],
-			SwitchCase: 1,
-		}],
-		// 🔧 禁止使用无意义的分号
-		'@typescript-eslint/no-extra-semi': 'error',
-		// 🔧 要求或禁止尾随逗号
-		'@typescript-eslint/comma-dangle': ['warn', {
-			'arrays': 'always-multiline',
-			'objects': 'always-multiline',
-			'imports': 'always-multiline',
-			'exports': 'always-multiline',
-			'functions': 'always-multiline',
-			'enums': 'always-multiline',
-			'generics': 'always-multiline',
-			'tuples': 'always-multiline',
-		}],
-		// 🔧 逗号前后的空格
-		'@typescript-eslint/comma-spacing': ['error', {
-			before: false,
-			after: true,
-		}],
-
 		// eslint 内置规则，详情见 `https://eslint.org/docs/latest/rules/*`
 		strict: ['error', 'never'],
 		// ✅🔧 多行注释
@@ -67,20 +24,20 @@ module.exports = {
 		'space-before-function-paren': 'off',
 		// 🔧 使用解构写法，而不是传统的赋值
 		'prefer-destructuring': 'error',
-		// 🔗🔧 要求或禁止尾随逗号, 使用 @typescript-eslint 规则代替
-		'comma-dangle': ['off', {
+		// 🔧 要求或禁止尾随逗号
+		'comma-dangle': ['warn', {
 			'arrays': 'always-multiline',
 			'objects': 'always-multiline',
 			'imports': 'always-multiline',
 			'exports': 'always-multiline',
 			'functions': 'always-multiline',
 		}],
-		// 🔗🔧 逗号前后的空格, 使用 @typescript-eslint 规则代替
-		'comma-spacing': ['off', { before: false, after: true }],
+		// 🔧 逗号前后的空格
+		'comma-spacing': ['error', { before: false, after: true }],
 		// 🔧 控制逗号在行尾出现还是在行首出现 (默认行尾)
 		'comma-style': ['error', 'last'],
-		// 🔗🔧 统一缩进, 使用 @typescript-eslint 规则代替
-		'indent': ['off', 'tab', { SwitchCase: 1 }],
+		// 🔧 统一缩进
+		'indent': ['error', 'tab', { SwitchCase: 1 }],
 		// 🔧 jsx 双引号
 		'jsx-quotes': ['error', 'prefer-double'],
 		// 🔧 单引号
@@ -96,8 +53,8 @@ module.exports = {
 		'eol-last': ['error', 'always'],
 		// 🔧 分号前后的空格
 		'semi-spacing': ['error', { before: false, after: true }],
-		// 🔗🔧 是否分号, 使用 @typescript-eslint 规则代替
-		semi: ['off', 'always'],
+		// 🔧 是否分号
+		semi: ['error', 'always'],
 		// 🔧 分号的位置
 		'semi-style': ['error', 'last'],
 		// 🚫 每行最大长度
@@ -120,8 +77,8 @@ module.exports = {
 		'no-nested-ternary': 'error',
 		// 🚫 条件语句中赋值
 		'no-cond-assign': 'error',
-		// 🔗 定义之前不要使用, 使用 @typescript-eslint 规则代替
-		'no-use-before-define': 'off',
+		// ⛔ 定义之前不要使用
+		'no-use-before-define': 'warn',
 		// ⛔ 不能给参数赋值
 		'no-param-reassign': 'warn',
 		// 🚫 语法限制
@@ -136,8 +93,8 @@ module.exports = {
 		'no-plusplus': 'off',
 		// 🔧 禁止使用无意义的标签
 		'no-extra-label': 'error',
-		// 🔗🔧 禁止使用无意义的分号, 使用 @typescript-eslint 规则代替
-		'no-extra-semi': 'off',
+		// 🔧 禁止使用无意义的分号
+		'no-extra-semi': 'error',
 		// 🔧 禁止使用无意义的 bind
 		'no-extra-bind': 'error',
 		// 🔧 禁止 if 语句中有 return 之后有 else
@@ -206,8 +163,8 @@ module.exports = {
 		'no-with': 'error',
 		// 🚫 禁止使用 delete 删除变量
 		'no-delete-var': 'error',
-		// 🔗 禁止重复的类成员, 使用 @typescript-eslint 规则代替
-		'no-dupe-class-members': 'off',
+		// 🚫 禁止重复的类成员
+		'no-dupe-class-members': 'error',
 		// 🚫 对于继承的类的构造函数，必须在使用 this 前调用 super()
 		'no-this-before-super': 'error',
 		// 🔧 禁止将if语句作为 else 块中的唯一语句
@@ -259,8 +216,8 @@ module.exports = {
 		'yield-star-spacing': ['error', 'after'],
 		// 🔧 计算键名的空格
 		'computed-property-spacing': ['error', 'never'],
-		// 🔗 调用函数时，括号前的空格, 使用 @typescript-eslint 规则代替
-		'func-call-spacing': ['off', 'never'],
+		// 🔧 调用函数时，括号前的空格
+		'func-call-spacing': ['error', 'never'],
 		// ✅🔧 定义函数时的参数间的换行
 		'function-paren-newline': ['off', 'consistent'],
 		// 🔧 关键字前后的空格

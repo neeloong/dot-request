@@ -3,7 +3,8 @@
   "version": "0.4.0",
   "description": "链式调用 fetch() 或创建 Request 对象",
   "scripts": {
-    "build": "tsc -p tsconfig.json && node build.mjs"
+    "build": "tsc -p tsconfig.json && node build.mjs",
+    "lint": "eslint --fix --ext .mjs src"
   },
   "author": "猛火 Fierflame",
   "license": "MIT",
@@ -18,11 +19,9 @@
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
-    "@types/node": "^20.11.30",
-    "@typescript-eslint/eslint-plugin": "^5.48.2",
-    "@typescript-eslint/parser": "^5.48.2",
-    "eslint": "^8.32.0",
-    "rollup": "^4.14.3",
+    "@types/node": "^20.12.7",
+    "eslint": "^9.1.1",
+    "rollup": "^4.16.4",
     "typescript": "^5.4.5"
   }
 }
