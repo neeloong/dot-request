@@ -3,6 +3,18 @@ import createFetch from './createFetch.mjs';
 import createRequest from './createRequest/index.mjs';
 import createSignalMap from './createSignalMap.mjs';
 
+
+/**
+ *
+ * @param {string | {raw: ArrayLike<string>} | undefined} template
+ * @param  {...any} values
+ * @returns
+ */
+function toString(template, ...values) {
+	if (!template) { return ''; }
+	if (typeof template === 'string') { return template; }
+	return String.raw(template, ...values.map(v => encodeURIComponent(v)));
+}
 /** @type {(request: Request, dotRequest: import('./DotRequest.mjs').DotRequest) => Promise<Response>} */
 const defaultFetch = r => fetch(r);
 class DotRequest {
@@ -115,65 +127,184 @@ class DotRequest {
 	}
 	/**
 	 * 将请求方法设置为 `GET`
-	 * @param path 新的路径，可选
+	 * @overload
 	 * @param {string} [path] 新的路径
 	 * @returns {ReturnType<this['build']>}
 	 */
-	get(path) { return this.method('get', path); }
+	/**
+	 * 将请求方法设置为 `GET`
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 将请求方法设置为 `GET`
+	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @returns {ReturnType<this['build']>}
+	 */
+	get(...args) { return this.method('get', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `POST`
-	 * @param path 新的路径，可选
+	 * @overload
 	 * @param {string} [path] 新的路径
 	 * @returns {ReturnType<this['build']>}
 	 */
-	post(path) { return this.method('post', path); }
+	/**
+	 * 将请求方法设置为 `POST`
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 将请求方法设置为 `POST`
+	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @returns {ReturnType<this['build']>}
+	 */
+	post(...args) { return this.method('post', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `PUT`
-	 * @param path 新的路径，可选
+	 * @overload
 	 * @param {string} [path] 新的路径
 	 * @returns {ReturnType<this['build']>}
 	 */
-	put(path) { return this.method('put', path); }
+	/**
+	 * 将请求方法设置为 `PUT`
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 将请求方法设置为 `PUT`
+	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @returns {ReturnType<this['build']>}
+	 */
+	put(...args) { return this.method('put', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `DELETE`
-	 * @param path 新的路径，可选
+	 * @overload
 	 * @param {string} [path] 新的路径
 	 * @returns {ReturnType<this['build']>}
 	 */
-	delete(path) { return this.method('delete', path); }
+	/**
+	 * 将请求方法设置为 `DELETE`
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 将请求方法设置为 `DELETE`
+	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @returns {ReturnType<this['build']>}
+	 */
+	delete(...args) { return this.method('delete', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `HEAD`
-	 * @param path 新的路径，可选
+	 * @overload
 	 * @param {string} [path] 新的路径
 	 * @returns {ReturnType<this['build']>}
 	 */
-	head(path) { return this.method('head', path); }
+	/**
+	 * 将请求方法设置为 `HEAD`
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 将请求方法设置为 `HEAD`
+	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @returns {ReturnType<this['build']>}
+	 */
+	head(...args) { return this.method('head', toString(...args)); }
 	/**
 	 * 修改请求路径
-	 * @param path 新的路径
+	 * @overload
 	 * @param {string} path 新的路径
 	 * @returns {ReturnType<this['build']>}
 	 */
-	path(path) { return this.#build({ path, append: [] }); }
+	/**
+	 * 修改请求路径
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 修改请求路径
+	 * @param {[string | {raw: ArrayLike<string>}, ...any]} args
+	 * @returns {ReturnType<this['build']>}
+	 */
+	path(...args) { return this.#build({ path: toString(...args), append: [] }); }
 	/**
 	 * 修改请求路径前缀
+	 * @overload
 	 * @param {string} [prefix] 新的路径前缀
 	 * @returns {ReturnType<this['build']>}
 	 */
-	prefix(prefix) { return this.#build({ prefix: prefix || '' }); }
+	/**
+	 * 修改请求路径前缀
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 修改请求路径前缀
+	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @returns {ReturnType<this['build']>}
+	 */
+	prefix(...args) { return this.#build({ prefix: toString(...args) }); }
 	/**
 	 * 修改请求路径后缀
+	 * @overload
 	 * @param {string} [suffix] 新的路径后缀
 	 * @returns {ReturnType<this['build']>}
 	 */
-	suffix(suffix) { return this.#build({ suffix: suffix || '' }); }
+	/**
+	 * 修改请求路径后缀
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 修改请求路径后缀
+	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @returns {ReturnType<this['build']>}
+	 */
+	suffix(...args) { return this.#build({ suffix: toString(...args) }); }
 	/**
 	 * 在请求路径后追加新的路径
+	 * @overload
 	 * @param {...string} path 追加的路径
 	 * @returns {ReturnType<this['build']>}
 	 */
+	/**
+	 * 在请求路径后追加新的路径
+	 * @overload
+	 * @param {{raw: ArrayLike<string>}} template
+	 * @param {...string} substitutions
+	 * @returns {ReturnType<this['build']>}
+	 */
+	/**
+	 * 在请求路径后追加新的路径
+	 * @param {any} path 追加的路径
+	 * @returns {ReturnType<this['build']>}
+	 */
 	append(...path) {
-		return this.#build({ append: [...this.#options.append, ...path] });
+		if (!path.length) { return this.#build({ append: [] }); }
+		if (typeof path[0] === 'string') {
+			return this.#build({ append: [...this.#options.append, ...path[0]] });
+		}
+		const [template, ...values] = path;
+		return this.#build({ append: [
+			...this.#options.append,
+			String.raw(template, ...values.map(v => encodeURIComponent(v))),
+		] });
 	}
 	/**
 	 * 获取设置的请求头
