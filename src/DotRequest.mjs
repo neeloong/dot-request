@@ -32,7 +32,6 @@ class DotRequest {
 		suffix: '',
 
 		headers: {},
-		query: {},
 		params: {},
 		redirect: true,
 
@@ -441,8 +440,9 @@ class DotRequest {
 	 * @returns {ReturnType<this['build']>}
 	 */
 	query(query) {
-		if (!query) { return this.#build({ query: {} }); }
-		return this.#build({ query: { ...this.#options.query, ...query } });
+		if (!query) { return this.#build({ query: undefined }); }
+		const oldQuery = this.#options.query;
+		return this.#build({ query: oldQuery ? [ ...oldQuery, query ] : [query] });
 	}
 	/**
 	 * 设置查询字符串

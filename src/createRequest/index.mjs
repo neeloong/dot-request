@@ -15,7 +15,7 @@ import StatisticsStream from '../StatisticsStream.mjs';
  * @property {Record<string, import('../types.mjs').HeaderValue | (() => import('../types.mjs').HeaderValue)>} headers
  *
  * @property {Record<string, any>} params
- * @property {Record<string, any>} [query]
+ * @property {Record<string, any>[]} [query]
  * @property {string} [search]
  * @property {any} [data]
  * @property {any} [body]
