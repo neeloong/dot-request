@@ -298,7 +298,7 @@ class DotRequest {
 	append(...path) {
 		if (!path.length) { return this.#build({ append: [] }); }
 		if (typeof path[0] === 'string') {
-			return this.#build({ append: [...this.#options.append, ...path[0]] });
+			return this.#build({ append: [...this.#options.append, ...path] });
 		}
 		const [template, ...values] = path;
 		return this.#build({ append: [
