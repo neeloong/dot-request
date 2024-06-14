@@ -12,6 +12,13 @@ export class Result {
 	}
 	get version() { return '__VERSION__'; }
 	/**
+	 * @param {Promise<Response>} response
+	 * @returns {Result}
+	 */
+	build(response) {
+		return new Result(response);
+	}
+	/**
 	 * 获取文本格式的相应体
 	 * @returns {Promise<string>}
 	 */
@@ -98,10 +105,11 @@ export class Result {
 	/**
 	 * 获取状态码在 200-299 的相应结果
 	 * @param {import('./types.mjs').ErrorHandler?} [error]
-	 * @returns {Result}
+	 * @returns {ReturnType<this['build']>}
 	 */
 	ok(error) {
-		return new Result(this.#response.then(v => {
+		// @ts-ignore
+		return this.build(this.#response.then(v => {
 			if (v.ok) { return v; }
 			if (typeof error !== 'function') { return Promise.reject(v); }
 			return Promise.resolve(error(v)).then(v => Promise.reject(v));
@@ -109,9 +117,12 @@ export class Result {
 	}
 	/**
 	 * 复制相应结果
-	 * @returns {Result}
+	 * @returns {ReturnType<this['build']>}
 	 */
-	clone() { return new Result(this.#response.then(r => r.clone())); }
+	clone() {
+		// @ts-ignore
+		return this.build(this.#response.then(r => r.clone()));
+	}
 
 	/**
 	 * 对相应按照 Promise.then 的方式处理
@@ -142,10 +153,11 @@ export class Result {
 	 * 对相应按照类似 Promise.then 的方式处理，但仍返回相应结果
 	 * @param {((v: Response) => any)?} handler
 	 * @param {((v: any) => any)?} catcher
-	 * @returns {Result}
+	 * @returns {ReturnType<this['build']>}
 	 */
 	do(handler, catcher) {
-		return new Result(this.#response.then(async e => {
+		// @ts-ignore
+		return this.build(this.#response.then(async e => {
 			if (typeof handler === 'function') {
 				await handler(e);
 			}
@@ -160,10 +172,11 @@ export class Result {
 	/**
 	 * 设置下载进度监听
 	 * @param {import('./types.mjs').ProgressListener} dp
-	 * @returns {Result}
+	 * @returns {ReturnType<this['build']>}
 	 */
 	downloadProgress(dp) {
-		return new Result(this.#response.then(r => {
+		// @ts-ignore
+		return this.build(this.#response.then(r => {
 			const totalN = Number(r.headers.get('Context-Length'));
 			const total = totalN >= 0 ? totalN : -1;
 			return new Response(

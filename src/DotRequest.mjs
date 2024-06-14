@@ -77,6 +77,20 @@ class DotRequest {
 		return new DotRequest();
 	}
 	/**
+	 *
+	 * @param {Promise<Response>} response
+	 * @param {object} [options]
+	 * @param {import('./types.mjs').ProgressListener?} [options.downloadProgress]
+	 * @param {import('./types.mjs').ErrorHandler?} [options.errorHandler]
+	 * @returns {Result}
+	 */
+	buildResult(response, {downloadProgress, errorHandler} = {}) {
+		let res = new Result(response);
+		if (downloadProgress) { res = res.downloadProgress(downloadProgress); }
+		if (errorHandler) { res = res.ok(errorHandler); }
+		return res;
+	}
+	/**
 	 * @template {DotRequest} T
 	 * @overload
 	 * @param {T} target
@@ -682,11 +696,11 @@ class DotRequest {
 	/**
 	 * 发送请求并获取相应结果
 	 * @overload
-	 * @returns {import('./Result.mjs').Result}
+	 * @returns {ReturnType<this['buildResult']>}
 	 */
 	/**
 	 * @param {import('./types.mjs').Fetch} [fetch]
-	 * @returns {import('./Result.mjs').Result | ReturnType<this['build']>}
+	 * @returns {ReturnType<this['buildResult']> | ReturnType<this['build']>}
 	 */
 	fetch(fetch) {
 		if (typeof fetch === 'function') {
@@ -696,18 +710,17 @@ class DotRequest {
 		}
 		const dotRequest = this.clone();
 		const response = this.#fetch(this.create(), dotRequest);
-		let res = new Result(response);
-		const dp = this.#downloadProgress;
-		if (dp) { res = res.downloadProgress(dp); }
-		const eh = this.#errorHandler;
-		if (eh) { res = res.ok(eh); }
+		const downloadProgress = this.#downloadProgress;
+		const errorHandler = this.#errorHandler;
+		const res = this.buildResult(response, {downloadProgress, errorHandler});
+		// @ts-ignore
 		return res;
 	}
 
 	/**
 	 * 发送请求，并获取状态码在 200-299 的相应结果
 	 * @param {import('./types.mjs').ErrorHandler?} [error]
-	 * @returns {import('./Result.mjs').Result}
+	 * @returns {ReturnType<ReturnType<this["buildResult"]>["build"]>}
 	 */
 	ok(error) { return this.fetch().ok(error); }
 	/**
