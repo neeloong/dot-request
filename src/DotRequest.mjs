@@ -82,7 +82,7 @@ class DotRequest {
 	 * @param {object} [options]
 	 * @param {import('./types.mjs').ProgressListener?} [options.downloadProgress]
 	 * @param {import('./types.mjs').ErrorHandler?} [options.errorHandler]
-	 * @returns {Result}
+	 * @returns {import('./Result.mjs').Result}
 	 */
 	buildResult(response, {downloadProgress, errorHandler} = {}) {
 		let res = new Result(response);
