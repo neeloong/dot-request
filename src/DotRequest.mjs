@@ -6,7 +6,7 @@ import createSignalMap from './createSignalMap.mjs';
 
 /**
  *
- * @param {string | {raw: ArrayLike<string>} | undefined} template
+ * @param {string | TemplateStringsArray | undefined} template
  * @param  {...any} values
  * @returns
  */
@@ -148,13 +148,13 @@ class DotRequest {
 	/**
 	 * 将请求方法设置为 `GET`
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 将请求方法设置为 `GET`
-	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {ReturnType<this['build']>}
 	 */
 	get(...args) { return this.method('get', toString(...args)); }
@@ -167,13 +167,13 @@ class DotRequest {
 	/**
 	 * 将请求方法设置为 `POST`
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 将请求方法设置为 `POST`
-	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {ReturnType<this['build']>}
 	 */
 	post(...args) { return this.method('post', toString(...args)); }
@@ -186,13 +186,13 @@ class DotRequest {
 	/**
 	 * 将请求方法设置为 `PUT`
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 将请求方法设置为 `PUT`
-	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {ReturnType<this['build']>}
 	 */
 	put(...args) { return this.method('put', toString(...args)); }
@@ -205,13 +205,13 @@ class DotRequest {
 	/**
 	 * 将请求方法设置为 `DELETE`
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 将请求方法设置为 `DELETE`
-	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {ReturnType<this['build']>}
 	 */
 	delete(...args) { return this.method('delete', toString(...args)); }
@@ -224,13 +224,13 @@ class DotRequest {
 	/**
 	 * 将请求方法设置为 `HEAD`
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 将请求方法设置为 `HEAD`
-	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {ReturnType<this['build']>}
 	 */
 	head(...args) { return this.method('head', toString(...args)); }
@@ -243,13 +243,13 @@ class DotRequest {
 	/**
 	 * 修改请求路径
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 修改请求路径
-	 * @param {[string | {raw: ArrayLike<string>}, ...any]} args
+	 * @param {[string | TemplateStringsArray, ...any]} args
 	 * @returns {ReturnType<this['build']>}
 	 */
 	path(...args) { return this.#build({ path: toString(...args), append: [] }); }
@@ -262,13 +262,13 @@ class DotRequest {
 	/**
 	 * 修改请求路径前缀
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 修改请求路径前缀
-	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {ReturnType<this['build']>}
 	 */
 	prefix(...args) { return this.#build({ prefix: toString(...args) }); }
@@ -281,13 +281,13 @@ class DotRequest {
 	/**
 	 * 修改请求路径后缀
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 修改请求路径后缀
-	 * @param {[string | {raw: ArrayLike<string>} | undefined, ...any]} args
+	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {ReturnType<this['build']>}
 	 */
 	suffix(...args) { return this.#build({ suffix: toString(...args) }); }
@@ -300,13 +300,13 @@ class DotRequest {
 	/**
 	 * 在请求路径后追加新的路径
 	 * @overload
-	 * @param {{raw: ArrayLike<string>}} template
-	 * @param {...string} substitutions
+	 * @param {TemplateStringsArray} template
+	 * @param {...any} substitutions
 	 * @returns {ReturnType<this['build']>}
 	 */
 	/**
 	 * 在请求路径后追加新的路径
-	 * @param {any} path 追加的路径
+	 * @param {...any} path 追加的路径
 	 * @returns {ReturnType<this['build']>}
 	 */
 	append(...path) {
