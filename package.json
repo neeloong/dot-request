@@ -10,12 +10,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/fierflame/dot-request.git"
+    "url": "https://gitee.com/neeloong/dot-request.git"
   },
   "bugs": {
-    "url": "https://gitee.com/fierflame/dot-request/issues"
+    "url": "https://gitee.com/neeloong/dot-request/issues"
   },
-  "homepage": "https://gitee.com/fierflame/dot-request#git-readme",
+  "homepage": "https://gitee.com/neeloong/dot-request#git-readme",
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
