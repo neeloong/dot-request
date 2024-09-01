@@ -118,207 +118,214 @@ class DotRequest {
 		return api;
 	}
 	/**
-	 * @template {keyof import('./createRequest/index.mjs').RequestParams} K
-	 * @param {Pick<import('./createRequest/index.mjs').RequestParams, K>} np
-	 * @returns {ReturnType<this['build']>}
-	 */
-	#build(np) {
-		const api = this.clone();
-		Object.assign(api.#options, np);
-		return api;
-	}
-	/**
 	 * 设置请求方法
 	 * @param {string} method 请求方法
 	 * @param {string} [path] 新的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	method(method, path) {
+		this.#options.method = method;
 		if (path) {
-			return this.#build({ method, path, append: [] });
+			this.#options.path = path;
+			this.#options.append = [];
 		}
-		return this.#build({ method });
+		return this;
 	}
 	/**
 	 * 将请求方法设置为 `GET`
 	 * @overload
 	 * @param {string} [path] 新的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `GET`
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `GET`
 	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	get(...args) { return this.method('get', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `POST`
 	 * @overload
 	 * @param {string} [path] 新的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `POST`
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `POST`
 	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	post(...args) { return this.method('post', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `PUT`
 	 * @overload
 	 * @param {string} [path] 新的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `PUT`
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `PUT`
 	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	put(...args) { return this.method('put', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `DELETE`
 	 * @overload
 	 * @param {string} [path] 新的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `DELETE`
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `DELETE`
 	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	delete(...args) { return this.method('delete', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `HEAD`
 	 * @overload
 	 * @param {string} [path] 新的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `HEAD`
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 将请求方法设置为 `HEAD`
 	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	head(...args) { return this.method('head', toString(...args)); }
 	/**
 	 * 修改请求路径
 	 * @overload
 	 * @param {string} path 新的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 修改请求路径
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 修改请求路径
 	 * @param {[string | TemplateStringsArray, ...any]} args
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
-	path(...args) { return this.#build({ path: toString(...args), append: [] }); }
+	path(...args) {
+		this.#options.path = toString(...args);
+		this.#options.append = [];
+		return this;
+	}
 	/**
 	 * 修改请求路径前缀
 	 * @overload
 	 * @param {string} [prefix] 新的路径前缀
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 修改请求路径前缀
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 修改请求路径前缀
 	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
-	prefix(...args) { return this.#build({ prefix: toString(...args) }); }
+	prefix(...args) {
+		this.#options.prefix = toString(...args);
+		return this;
+	}
 	/**
 	 * 修改请求路径后缀
 	 * @overload
 	 * @param {string} [suffix] 新的路径后缀
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 修改请求路径后缀
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 修改请求路径后缀
 	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
-	suffix(...args) { return this.#build({ suffix: toString(...args) }); }
+	suffix(...args) {
+		this.#options.suffix = toString(...args);
+		return this;
+	}
 	/**
 	 * 在请求路径后追加新的路径
 	 * @overload
 	 * @param {...string} path 追加的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 在请求路径后追加新的路径
 	 * @overload
 	 * @param {TemplateStringsArray} template
 	 * @param {...any} substitutions
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 在请求路径后追加新的路径
 	 * @param {...any} path 追加的路径
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	append(...path) {
-		if (!path.length) { return this.#build({ append: [] }); }
+		if (!path.length) {
+			this.#options.append = [];
+			return this;
+		}
 		if (typeof path[0] === 'string') {
-			return this.#build({ append: [...this.#options.append, ...path] });
+			this.#options.append = [...this.#options.append, ...path];
+			return this;
 		}
 		const [template, ...values] = path;
-		return this.#build({ append: [
+		this.#options.append = [
 			...this.#options.append,
 			String.raw(template, ...values.map(v => encodeURIComponent(v))),
-		] });
+		];
+		return this;
 	}
 	/**
 	 * 获取设置的请求头
@@ -331,13 +338,13 @@ class DotRequest {
 	 * @overload
 	 * @param {string} name 要设置的请求头名称
 	 * @param {import('./types.mjs').HeaderValue | (() => import('./types.mjs').HeaderValue)} value 要设置的请求头内容
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 设置请求头
 	 * @overload
 	 * @param {Record<string, import('./types.mjs').HeaderValue | (() => import('./types.mjs').HeaderValue)>} headers 要设置的请求头
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 *
@@ -347,16 +354,18 @@ class DotRequest {
 	header(name, value) {
 		const {headers} = this.#options;
 		if (typeof name !== 'string') {
-			return this.#build({ headers: { ...headers, ...name } });
+			this.#options.headers = { ...headers, ...name };
+			return this;
 		}
 		if (arguments.length < 2) { return headers[name]; }
-		return this.#build({ headers: { ...headers, [name]: value } });
+		this.#options.headers = { ...headers, [name]: value };
+		return this;
 	}
 	/**
 	 * 设置重定向模式
 	 * @overload
 	 * @param {boolean | 'error'} redirect 重定向模式
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 * @description true 自动重定向
 	 * @description false 不进行重定向
 	 * @description 'error' 如果产生重定向将自动终止并且抛出一个错误
@@ -373,15 +382,14 @@ class DotRequest {
 	 */
 	redirect(redirect) {
 		if (!arguments.length) { return this.#options.redirect; }
-		return this.#build({
-			redirect: typeof redirect === 'boolean' ? redirect : 'error',
-		});
+		this.#options.redirect = typeof redirect === 'boolean' ? redirect : 'error';
+		return this;
 	}
 	/**
 	 * 设置超时时间
 	 * @overload
 	 * @param {number} ms 超时时间，单位毫秒
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 获取设置的超时时间
@@ -395,13 +403,14 @@ class DotRequest {
 	 */
 	timeout(t) {
 		if (!arguments.length) { return this.#options.timeout || 0; }
-		return this.#build({ timeout: typeof t === 'number' && t > 0 ? t : 0 });
+		this.#options.timeout = typeof t === 'number' && t > 0 ? t : 0;
+		return this;
 	}
 	/**
 	 * 设置浏览器对凭证信息的控制方式
 	 * @overload
 	 * @param {RequestCredentials?} credentials 操作方式
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 获取已设置浏览器对凭证信息的控制方式
@@ -413,15 +422,15 @@ class DotRequest {
 	 */
 	credentials(credentials) {
 		if (!arguments.length) { return this.#options.credentials; }
-		return this.#build({
-			credentials: typeof credentials === 'string' && credentials || null,
-		});
+		this.#options.credentials =
+			typeof credentials === 'string' && credentials || null;
+		return this;
 	}
 	/**
 	 * 设置请求模式
 	 * @overload
 	 * @param {RequestMode?} mode 请求模式
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 获取设置的请求模式
@@ -430,18 +439,19 @@ class DotRequest {
 	 */
 	/**
 	 * @param {RequestMode?} [mode]
-	 * @returns {ReturnType<this['build']> | RequestMode?}
+	 * @returns {this | RequestMode?}
 	 */
 	mode(mode) {
 		// @ts-ignore
 		if (!arguments.length) { return this.#options.mode || ''; }
-		return this.#build({ mode: typeof mode === 'string' && mode || null });
+		this.#options.mode = typeof mode === 'string' && mode || null;
+		return this;
 	}
 	/**
 	 * 设置缓存模式
 	 * @overload
 	 * @param {RequestCache?} cache 缓存模式
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 获取设置的缓存模式
@@ -453,13 +463,14 @@ class DotRequest {
 	 */
 	cache(cache) {
 		if (!arguments.length) { return this.#options.cache; }
-		return this.#build({ cache: typeof cache === 'string' && cache || null });
+		this.#options.cache = typeof cache === 'string' && cache || null;
+		return this;
 	}
 	/**
 	 * 指定请求头中 referrer 的模式
 	 * @overload
 	 * @param {string} referrer referrer 的模式
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 获取已设置的请求头中 referrer 的模式
@@ -471,15 +482,14 @@ class DotRequest {
 	 */
 	referrer(referrer) {
 		if (!arguments.length) { return this.#options.referrer; }
-		return this.#build({
-			referrer: typeof referrer === 'string' ? referrer : '',
-		});
+		this.#options.referrer = typeof referrer === 'string' ? referrer : '';
+		return this;
 	}
 	/**
 	 * 设置请求头中 Referrer-Policy
 	 * @overload
 	 * @param {ReferrerPolicy?} rp Referrer-Policy 值
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 获取已设置的请求头中 Referrer-Policy
@@ -491,15 +501,14 @@ class DotRequest {
 	 */
 	referrerPolicy(rp) {
 		if (!arguments.length) { return this.#options.referrerPolicy; }
-		return this.#build({
-			referrerPolicy: typeof rp === 'string' && rp || null,
-		});
+		this.#options.referrerPolicy = typeof rp === 'string' && rp || null;
+		return this;
 	}
 	/**
 	 * 设置子资源完整性验证信息
 	 * @overload
 	 * @param {string} integrity
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 获取已设置的子资源完整性验证信息
@@ -511,15 +520,14 @@ class DotRequest {
 	 */
 	integrity(integrity) {
 		if (!arguments.length) { return this.#options.integrity; }
-		return this.#build({
-			integrity: typeof integrity === 'string' ? integrity : '',
-		});
+		this.#options.integrity = typeof integrity === 'string' ? integrity : '';
+		return this;
 	}
 	/**
 	 * 设置在页面被关闭后，链接是否可以继续保持活跃
 	 * @overload
 	 * @param {boolean} keep
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 获取已设置的活跃配置
@@ -531,7 +539,8 @@ class DotRequest {
 	 */
 	keepalive(keep) {
 		if (typeof keep !== 'boolean') { return this.#options.keepalive || false; }
-		return this.#build({ keepalive: keep });
+		this.#options.keepalive = keep;
+		return this;
 	}
 	/**
 	 * 获取设置的上下文数据
@@ -545,13 +554,13 @@ class DotRequest {
 	 * @overload
 	 * @param {string | symbol} name 要设置的上下文数据名称
 	 * @param {*} value 要设置的上下文数据内容
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 设置上下文数据
 	 * @overload
 	 * @param {Record<string, any>} context 要设置的上下文数据
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * @param {string | symbol | Record<string, any>} name
@@ -560,127 +569,136 @@ class DotRequest {
 	context(name, value) {
 		const context = this.#context;
 		if (typeof name !== 'string' && typeof name !== 'symbol') {
-			const api = this.clone();
-			api.#context = { ...context, ...name };
-			return api;
+			this.#context = { ...context, ...name };
+			return this;
 		}
 		if (arguments.length < 2) { return context[name]; }
-		const api = this.clone();
-		api.#context = { ...context, [name]: value };
-		return api;
+		this.#context = { ...context, [name]: value };
+		return this;
 	}
 
 	/**
 	 * 设置路径参数
 	 * @param {Record<string, string | number>} [params]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	params(params) {
-		if (!params) { return this.#build({ params: {} }); }
-		return this.#build({ params: { ...this.#options.params, ...params } });
+		this.#options.params = params ? { ...this.#options.params, ...params } : {};
+		return this;
 	}
 	/**
 	 * 设置查询参数
 	 * @param {Record<string, any>} [query]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	query(query) {
-		if (!query) { return this.#build({ query: undefined }); }
+		if (!query) {
+			delete this.#options.query;
+			return this;
+		}
 		const oldQuery = this.#options.query;
-		return this.#build({ query: oldQuery ? [ ...oldQuery, query ] : [query] });
+		this.#options.query = oldQuery ? [ ...oldQuery, query ] : [query];
+		return this;
 	}
 	/**
 	 * 设置查询字符串
 	 * @param {string} [search]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
-	search(search) { return this.#build({ search }); }
+	search(search) {
+		this.#options.search =search;
+		return this;
+	}
 	/**
 	 * 设置请求数据
 	 * @param {Record<string, any>} [data]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
-	data(data) { return this.#build({ data }); }
+	data(data) {
+		this.#options.data = data;
+		return this;
+	}
 	/**
 	 * 设置请求身体
 	 * @overload
 	 * @param {import('./types.mjs').BodyData} [body]
 	 * @param {string} [type]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 设置请求身体
 	 * @overload
 	 * @param {object | Record<string, any>} [body]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 设置请求身体
 	 * @param {*} [body]
 	 * @param {string} [type]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
-	body(body, type) { return this.#build({ body, type }); }
+	body(body, type) {
+		this.#options.body = body;
+		this.#options.type = type;
+		return this;
+	}
 	/**
 	 * 设置请求身体
 	 * @param {FormData | object | Record<string, any>} [form]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
-	form(form) { return this.#build({ body: form, type: true }); }
+	form(form) {
+		this.#options.body = form;
+		this.#options.type = true;
+		return this;
+	}
 
 	/**
 	 * 设置中断信号
 	 * @param {import('./types.mjs').Signal} [signal]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
-	signal(signal) { return this.#build({ signal: signal || null }); }
+	signal(signal) {
+		this.#options.signal = signal || null;
+		return this;
+	}
 	/**
 	 * 设置中断信号处理函数
 	 * @param {import('./types.mjs').SignalHandler | boolean} [handler]
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	signalHandler(handler) {
-		return this.#build({
-			signalHandler: handler === true ? createSignalMap() : handler || null,
-		});
+		this.#options.signalHandler =
+			handler === true ? createSignalMap() : handler || null;
+		return this;
 	}
 
 	/**
-	 * 设置请求方法
-	 * @deprecated 请用 `dr.fetch(fetch)` 代替
-	 * @param {import('./types.mjs').Fetch} fetch
-	 * @returns {ReturnType<this['build']>}
-	 */
-	interface(fetch) { return this.fetch(fetch); }
-	/**
 	 * 设置上传进度监听
 	 * @param {import('./types.mjs').ProgressListener} up
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	uploadProgress(up) {
-		return this.#build({
-			uploadProgress: typeof up === 'function' ? up : null,
-		});
+		this.#options.uploadProgress = typeof up === 'function' ? up : null;
+		return this;
 	}
 	/**
 	 * 设置下载进度监听
 	 * @param {import('./types.mjs').ProgressListener?} dp
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	downloadProgress(dp) {
-		const api = this.clone();
-		api.#downloadProgress = typeof dp === 'function' ? dp : null;
-		return api;
+		this.#downloadProgress = typeof dp === 'function' ? dp : null;
+		return this;
 	}
 	/**
 	 * 设置异常相应处理函数
 	 * @param {import('./types.mjs').ErrorHandler?} eh
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	errorHandler(eh) {
-		const api = this.clone();
-		api.#errorHandler = typeof eh === 'function' ? eh : null;
-		return api;
+		this.#errorHandler = typeof eh === 'function' ? eh : null;
+		return this;
 	}
 	/**
 	 * 创建对应的 Request 对象
@@ -691,7 +709,7 @@ class DotRequest {
 	 * 设置请求方法
 	 * @overload
 	 * @param {import('./types.mjs').Fetch} fetch
-	 * @returns {ReturnType<this['build']>}
+	 * @returns {this}
 	 */
 	/**
 	 * 发送请求并获取相应结果
@@ -700,13 +718,12 @@ class DotRequest {
 	 */
 	/**
 	 * @param {import('./types.mjs').Fetch} [fetch]
-	 * @returns {ReturnType<this['buildResult']> | ReturnType<this['build']>}
+	 * @returns {ReturnType<this['buildResult']> | this}
 	 */
 	fetch(fetch) {
 		if (typeof fetch === 'function') {
-			const api = this.clone();
-			api.#fetch = createFetch(fetch, this.#fetch);
-			return api;
+			this.#fetch = createFetch(fetch, this.#fetch);
+			return this;
 		}
 		const dotRequest = this.clone();
 		const response = this.#fetch(this.create(), dotRequest);
