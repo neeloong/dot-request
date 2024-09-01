@@ -737,7 +737,7 @@ class DotRequest {
 	/**
 	 * 发送请求，并获取状态码在 200-299 的相应结果
 	 * @param {import('./types.mjs').ErrorHandler?} [error]
-	 * @returns {ReturnType<ReturnType<this["buildResult"]>["build"]>}
+	 * @returns {ReturnType<this["buildResult"]>}
 	 */
 	ok(error) { return this.fetch().ok(error); }
 	/**
