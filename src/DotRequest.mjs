@@ -421,20 +421,19 @@ class DotRequest {
 	/**
 	 * 设置请求模式
 	 * @overload
-	 * @param {RequestMode?} mode 请求模式
+	 * @param {RequestMode | '' | null} mode 请求模式
 	 * @returns {this}
 	 */
 	/**
 	 * 获取设置的请求模式
 	 * @overload
-	 * @returns {RequestMode?}
+	 * @returns {RequestMode | ''}
 	 */
 	/**
-	 * @param {RequestMode?} [mode]
-	 * @returns {this | RequestMode?}
+	 * @param {RequestMode | '' | null} [mode]
+	 * @returns {this | RequestMode | ''}
 	 */
 	mode(mode) {
-		// @ts-ignore
 		if (!arguments.length) { return this.#options.mode || ''; }
 		this.#options.mode = typeof mode === 'string' && mode || null;
 		return this;
