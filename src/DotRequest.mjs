@@ -79,17 +79,9 @@ class DotRequest {
 	/**
 	 *
 	 * @param {Promise<Response>} response
-	 * @param {object} [options]
-	 * @param {import('./types.mjs').ProgressListener?} [options.downloadProgress]
-	 * @param {import('./types.mjs').ErrorHandler?} [options.errorHandler]
 	 * @returns {import('./Result.mjs').Result}
 	 */
-	buildResult(response, {downloadProgress, errorHandler} = {}) {
-		let res = new Result(response);
-		if (downloadProgress) { res = res.downloadProgress(downloadProgress); }
-		if (errorHandler) { res = res.ok(errorHandler); }
-		return res;
-	}
+	buildResult(response) { return new Result(response); }
 	/**
 	 * @template {DotRequest} T
 	 * @overload
@@ -727,11 +719,13 @@ class DotRequest {
 		}
 		const dotRequest = this.clone();
 		const response = this.#fetch(this.create(), dotRequest);
-		const downloadProgress = this.#downloadProgress;
-		const errorHandler = this.#errorHandler;
-		const res = this.buildResult(response, {downloadProgress, errorHandler});
+		let result = this.buildResult(response);
+		const dp = this.#downloadProgress;
+		if (dp) { result = result.downloadProgress(dp); }
+		const eh = this.#errorHandler;
+		if (eh) { result = result.ok(eh); }
 		// @ts-ignore
-		return res;
+		return result;
 	}
 
 	/**
