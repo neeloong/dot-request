@@ -60,6 +60,8 @@ export default function createRequest({
 	const init = {
 		method,
 		headers,
+		// @ts-ignore
+		duplex: 'half',
 		signal: mergeSignal(
 			getSignal(signal, signalHandler),
 			timeout ? AbortSignal.timeout(timeout) : null,
@@ -148,6 +150,8 @@ export default function createRequest({
 		return request;
 	}
 	return new Request(request, {
+		// @ts-ignore
+		duplex: 'half',
 		body: requestBody.pipeThrough(new StatisticsStream(progress => {
 			uploadProgress(progress, total);
 		})),
