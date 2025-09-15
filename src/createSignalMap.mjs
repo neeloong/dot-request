@@ -1,3 +1,4 @@
+/** @import { SignalMap } from './types.mjs' */
 /**
  *
  * @param {*} v
@@ -8,7 +9,7 @@ function isObject(v) {
 }
 /**
  *
- * @returns {import('./types.mjs').SignalMap}
+ * @returns {SignalMap}
  */
 export default function createSignalMap() {
 	/** @typedef {string | number | bigint | boolean | symbol} PrimitiveType */

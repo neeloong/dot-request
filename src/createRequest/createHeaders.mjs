@@ -1,6 +1,7 @@
+/** @import { HeaderValue } from '../types.mjs' */
 /**
  *
- * @param {Record<string, import('../types.mjs').HeaderValue | (() => import('../types.mjs').HeaderValue)>} [baseHeaders]
+ * @param {Record<string, HeaderValue | (() => HeaderValue)>} [baseHeaders]
  * @returns
  */
 export default function createHeaders(baseHeaders) {

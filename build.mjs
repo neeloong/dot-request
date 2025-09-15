@@ -68,11 +68,6 @@ const bundle = await rollup({
 		replace({
 			preventAssignment: true, values: {
 				__VERSION__: version,
-				[`import('./types.mjs').`]: '',
-				[`import('../types.mjs').`]: '',
-				[`import('./DotRequest.mjs').`]: '',
-				[`import('./Result.mjs').`]: '',
-				[`import('./createRequest/index.mjs').`]: '',
 			}
 		}),
 	],

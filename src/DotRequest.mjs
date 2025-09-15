@@ -2,6 +2,8 @@ import { Result } from './Result.mjs';
 import createFetch from './createFetch.mjs';
 import createRequest from './createRequest/index.mjs';
 import createSignalMap from './createSignalMap.mjs';
+/** @import { Fetch, ProgressListener, ErrorHandler, HeaderValue, BodyData, Signal, SignalHandler } from './types.mjs' */
+/** @import { RequestParams } from './createRequest/index.mjs' */
 
 
 /**
@@ -15,12 +17,12 @@ function toString(template, ...values) {
 	if (typeof template === 'string') { return template; }
 	return String.raw(template, ...values.map(v => encodeURIComponent(v)));
 }
-/** @type {(request: Request, dotRequest: import('./DotRequest.mjs').DotRequest) => Promise<Response>} */
+/** @type {(request: Request, dotRequest: DotRequest) => Promise<Response>} */
 const defaultFetch = r => fetch(r);
 class DotRequest {
 	/**
 	 * @param {object} options
-	 * @param {import('./types.mjs').Fetch | import('./types.mjs').Fetch[]} [options.fetch]
+	 * @param {Fetch | Fetch[]} [options.fetch]
 	 * @returns {DotRequest}
 	 */
 	static create({ fetch }) {
@@ -36,7 +38,7 @@ class DotRequest {
 		return s;
 	}
 	static get Result() { return Result; }
-	/** @type {import('./createRequest/index.mjs').RequestParams} */
+	/** @type {RequestParams} */
 	#options = {
 		prefix: '',
 		path: '',
@@ -65,9 +67,9 @@ class DotRequest {
 	#fetch = defaultFetch;
 	/** @type {Record<string | symbol, any>} */
 	#context = {};
-	/** @type {import('./types.mjs').ProgressListener?} */
+	/** @type {ProgressListener?} */
 	#downloadProgress = null;
-	/** @type {import('./types.mjs').ErrorHandler?} */
+	/** @type {ErrorHandler?} */
 	#errorHandler = null;
 	get version() { return '__VERSION__'; }
 	/**
@@ -79,7 +81,7 @@ class DotRequest {
 	/**
 	 *
 	 * @param {Promise<Response>} response
-	 * @returns {import('./Result.mjs').Result}
+	 * @returns {Result}
 	 */
 	buildResult(response) { return new Result(response); }
 	/**
@@ -323,25 +325,25 @@ class DotRequest {
 	 * 获取设置的请求头
 	 * @overload
 	 * @param {string} name 要获取的请求头名称
-	 * @returns {import('./types.mjs').HeaderValue | (() => import('./types.mjs').HeaderValue)}
+	 * @returns {HeaderValue | (() => HeaderValue)}
 	 */
 	/**
 	 * 设置一项请求头
 	 * @overload
 	 * @param {string} name 要设置的请求头名称
-	 * @param {import('./types.mjs').HeaderValue | (() => import('./types.mjs').HeaderValue)} value 要设置的请求头内容
+	 * @param {HeaderValue | (() => HeaderValue)} value 要设置的请求头内容
 	 * @returns {this}
 	 */
 	/**
 	 * 设置请求头
 	 * @overload
-	 * @param {Record<string, import('./types.mjs').HeaderValue | (() => import('./types.mjs').HeaderValue)>} headers 要设置的请求头
+	 * @param {Record<string, HeaderValue | (() => HeaderValue)>} headers 要设置的请求头
 	 * @returns {this}
 	 */
 	/**
 	 *
-	 * @param {string | Record<string, import('./types.mjs').HeaderValue | (() => import('./types.mjs').HeaderValue)>} name
-	 * @param {import('./types.mjs').HeaderValue | (() => import('./types.mjs').HeaderValue)} [value]
+	 * @param {string | Record<string, HeaderValue | (() => HeaderValue)>} name
+	 * @param {HeaderValue | (() => HeaderValue)} [value]
 	 */
 	header(name, value) {
 		const {headers} = this.#options;
@@ -612,7 +614,7 @@ class DotRequest {
 	/**
 	 * 设置请求身体
 	 * @overload
-	 * @param {import('./types.mjs').BodyData} [body]
+	 * @param {BodyData} [body]
 	 * @param {string} [type]
 	 * @returns {this}
 	 */
@@ -646,7 +648,7 @@ class DotRequest {
 
 	/**
 	 * 设置中断信号
-	 * @param {import('./types.mjs').Signal} [signal]
+	 * @param {Signal} [signal]
 	 * @returns {this}
 	 */
 	signal(signal) {
@@ -655,7 +657,7 @@ class DotRequest {
 	}
 	/**
 	 * 设置中断信号处理函数
-	 * @param {import('./types.mjs').SignalHandler | boolean} [handler]
+	 * @param {SignalHandler | boolean} [handler]
 	 * @returns {this}
 	 */
 	signalHandler(handler) {
@@ -666,7 +668,7 @@ class DotRequest {
 
 	/**
 	 * 设置上传进度监听
-	 * @param {import('./types.mjs').ProgressListener} up
+	 * @param {ProgressListener} up
 	 * @returns {this}
 	 */
 	uploadProgress(up) {
@@ -675,7 +677,7 @@ class DotRequest {
 	}
 	/**
 	 * 设置下载进度监听
-	 * @param {import('./types.mjs').ProgressListener?} dp
+	 * @param {ProgressListener?} dp
 	 * @returns {this}
 	 */
 	downloadProgress(dp) {
@@ -684,7 +686,7 @@ class DotRequest {
 	}
 	/**
 	 * 设置异常相应处理函数
-	 * @param {import('./types.mjs').ErrorHandler?} eh
+	 * @param {ErrorHandler?} eh
 	 * @returns {this}
 	 */
 	errorHandler(eh) {
@@ -699,7 +701,7 @@ class DotRequest {
 	/**
 	 * 设置请求方法
 	 * @overload
-	 * @param {import('./types.mjs').Fetch} fetch
+	 * @param {Fetch} fetch
 	 * @returns {this}
 	 */
 	/**
@@ -708,7 +710,7 @@ class DotRequest {
 	 * @returns {ReturnType<this['buildResult']>}
 	 */
 	/**
-	 * @param {import('./types.mjs').Fetch} [fetch]
+	 * @param {Fetch} [fetch]
 	 * @returns {ReturnType<this['buildResult']> | this}
 	 */
 	fetch(fetch) {
@@ -729,7 +731,7 @@ class DotRequest {
 
 	/**
 	 * 发送请求，并获取状态码在 200-299 的相应结果
-	 * @param {import('./types.mjs').ErrorHandler?} [error]
+	 * @param {ErrorHandler?} [error]
 	 * @returns {ReturnType<this["buildResult"]>}
 	 */
 	ok(error) { return this.fetch().ok(error); }

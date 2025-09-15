@@ -1,3 +1,4 @@
+/** @import { ErrorHandler, ProgressListener } from './types.mjs' */
 import StatisticsStream from './StatisticsStream.mjs';
 
 export class Result {
@@ -104,7 +105,7 @@ export class Result {
 
 	/**
 	 * 获取状态码在 200-299 的相应结果
-	 * @param {import('./types.mjs').ErrorHandler?} [error]
+	 * @param {ErrorHandler?} [error]
 	 * @returns {this}
 	 */
 	ok(error) {
@@ -171,7 +172,7 @@ export class Result {
 	}
 	/**
 	 * 设置下载进度监听
-	 * @param {import('./types.mjs').ProgressListener} dp
+	 * @param {ProgressListener} dp
 	 * @returns {this}
 	 */
 	downloadProgress(dp) {

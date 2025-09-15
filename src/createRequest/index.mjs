@@ -1,3 +1,5 @@
+/** @import { HeaderValue, ProgressListener, Signal, SignalHandler } from '../types.mjs' */
+
 import getSignal from './getSignal.mjs';
 import getPath from './getPath.mjs';
 import createHeaders from './createHeaders.mjs';
@@ -12,7 +14,7 @@ import StatisticsStream from '../StatisticsStream.mjs';
  * @property {string[]} append
  * @property {string} suffix
  *
- * @property {Record<string, import('../types.mjs').HeaderValue | (() => import('../types.mjs').HeaderValue)>} headers
+ * @property {Record<string, HeaderValue | (() => HeaderValue)>} headers
  *
  * @property {Record<string, any>} params
  * @property {Record<string, any>[]} [query]
@@ -21,8 +23,8 @@ import StatisticsStream from '../StatisticsStream.mjs';
  * @property {any} [body]
  * @property {string | boolean} [type]
  *
- * @property {import('../types.mjs').Signal | boolean | null} signal
- * @property {import('../types.mjs').SignalHandler?} signalHandler
+ * @property {Signal | boolean | null} signal
+ * @property {SignalHandler?} signalHandler
  *
  * @property {boolean | 'error' | 'follow' | 'manual'} redirect
  *
@@ -34,7 +36,7 @@ import StatisticsStream from '../StatisticsStream.mjs';
  * @property {RequestCache | null} cache
  * @property {string} referrer
  * @property {ReferrerPolicy | null} referrerPolicy
- * @property {import('../types.mjs').ProgressListener?} uploadProgress
+ * @property {ProgressListener?} uploadProgress
  */
 
 

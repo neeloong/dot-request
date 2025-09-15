@@ -1,3 +1,4 @@
+/** @import { Fetch, ProgressListener, ErrorHandler, HeaderValue, BodyData, Signal, SignalHandler, SignalMap, SignalMapToken } from '../types.mjs' */
 import createSignalMap from '../createSignalMap.mjs';
 
 const types = new Set([
@@ -12,7 +13,7 @@ const abortTokens = createSignalMap();
 
 /**
  *
- * @param {import('../types.mjs').SignalMap} tokens
+ * @param {SignalMap} tokens
  * @param {*} [signal]
  * @returns {AbortSignal?}
  */
@@ -27,7 +28,7 @@ function toSignal(tokens, signal) {
 /**
  *
  * @param {*} v
- * @returns {v is import('../types.mjs').SignalMap}
+ * @returns {v is SignalMap}
  */
 function isSignalMap(v) {
 	if (!v) { return false; }
@@ -37,14 +38,14 @@ function isSignalMap(v) {
 	return true;
 }
 
-/** @type {Map<import('../types.mjs').SignalMapToken, import('../types.mjs').SignalMap>} */
+/** @type {Map<SignalMapToken, SignalMap>} */
 const signalMaps = new Map();
 
 const mapTypes = new Set(['string', 'symbol', 'number', 'bigint']);
 /**
  *
  * @param {*} [handler]
- * @returns {import('../types.mjs').SignalMap}
+ * @returns {SignalMap}
  */
 function toSignalMap(handler) {
 	if (isSignalMap(handler)) { return handler; }
@@ -57,8 +58,8 @@ function toSignalMap(handler) {
 }
 /**
  *
- * @param {import('../types.mjs').Signal?} signal
- * @param {import('../types.mjs').SignalHandler?} handler
+ * @param {Signal?} signal
+ * @param {SignalHandler?} handler
  * @returns {AbortSignal?}
  */
 export default function getSignal(

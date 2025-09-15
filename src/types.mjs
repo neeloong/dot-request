@@ -1,3 +1,4 @@
+/** @import { DotRequest } from './DotRequest.mjs' */
 
 /**
  * @typedef {AbortSignal | number | bigint | string | symbol | object | boolean | Record<string, any>} Signal
@@ -35,7 +36,7 @@
 /**
  * @callback Fetch
  * @param {Request} request
- * @param {(request?: Request, dotRequest?: import('./DotRequest.mjs').DotRequest) => Promise<Response>} fetch
- * @param {import('./DotRequest.mjs').DotRequest} dotRequest
+ * @param {(request?: Request, dotRequest?: DotRequest) => Promise<Response>} fetch
+ * @param {DotRequest} dotRequest
  * @returns {PromiseLike<Response> | Response}
  */
