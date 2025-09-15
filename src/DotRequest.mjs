@@ -46,6 +46,7 @@ class DotRequest {
 		suffix: '',
 
 		headers: {},
+		headerGroups: [],
 		params: {},
 		redirect: true,
 
@@ -324,6 +325,12 @@ class DotRequest {
 	/**
 	 * 获取设置的请求头
 	 * @overload
+	 * @param {() => Record<string, HeaderValue>?} headers 要设置的请求头
+	 * @returns {HeaderValue | (() => HeaderValue)}
+	 */
+	/**
+	 * 获取设置的请求头
+	 * @overload
 	 * @param {string} name 要获取的请求头名称
 	 * @returns {HeaderValue | (() => HeaderValue)}
 	 */
@@ -342,10 +349,14 @@ class DotRequest {
 	 */
 	/**
 	 *
-	 * @param {string | Record<string, HeaderValue | (() => HeaderValue)>} name
+	 * @param {string | Record<string, HeaderValue | (() => HeaderValue)> | (() => Record<string, HeaderValue>?)} name
 	 * @param {HeaderValue | (() => HeaderValue)} [value]
 	 */
 	header(name, value) {
+		if (typeof name === 'function') {
+			this.#options.headerGroups = [...this.#options.headerGroups, name];
+			return this;
+		}
 		const {headers} = this.#options;
 		if (typeof name !== 'string') {
 			this.#options.headers = { ...headers, ...name };

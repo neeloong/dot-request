@@ -14,6 +14,7 @@ import StatisticsStream from '../StatisticsStream.mjs';
  * @property {string[]} append
  * @property {string} suffix
  *
+ * @property {(() => Record<string, HeaderValue>?)[]} headerGroups
  * @property {Record<string, HeaderValue | (() => HeaderValue)>} headers
  *
  * @property {Record<string, any>} params
@@ -50,14 +51,14 @@ export default function createRequest({
 	prefix, path, append, suffix,
 	params, query, search, data, body, type,
 	signal, signalHandler,
-	headers: baseHeaders,
+	headerGroups, headers: baseHeaders,
 
 	uploadProgress,
 
 	timeout,
 	integrity, keepalive, credentials, mode, cache, referrer, referrerPolicy,
 }) {
-	const headers = createHeaders(baseHeaders);
+	const headers = createHeaders(headerGroups, baseHeaders);
 	/** @type {RequestInit} */
 	const init = {
 		method,
