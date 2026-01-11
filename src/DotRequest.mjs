@@ -64,6 +64,7 @@ class DotRequest {
 		referrerPolicy: null,
 
 		uploadProgress: null,
+		stringifyJSON: null,
 	};
 	#fetch = defaultFetch;
 	/** @type {Record<string | symbol, any>} */
@@ -684,6 +685,15 @@ class DotRequest {
 	 */
 	uploadProgress(up) {
 		this.#options.uploadProgress = typeof up === 'function' ? up : null;
+		return this;
+	}
+	/**
+	 * 设置 JSON 字符串化函数
+	 * @param {((value: any) => string)?} [fn]
+	 * @returns {this}
+	 */
+	stringifyJSON(fn) {
+		this.#options.stringifyJSON = typeof fn === 'function' ? fn : null;
 		return this;
 	}
 	/**

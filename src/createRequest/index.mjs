@@ -38,6 +38,7 @@ import StatisticsStream from '../StatisticsStream.mjs';
  * @property {string} referrer
  * @property {ReferrerPolicy | null} referrerPolicy
  * @property {ProgressListener?} uploadProgress
+ * @property {((value: any) => string)?} stringifyJSON
  */
 
 
@@ -57,6 +58,7 @@ export default function createRequest({
 
 	timeout,
 	integrity, keepalive, credentials, mode, cache, referrer, referrerPolicy,
+	stringifyJSON,
 }) {
 	const headers = createHeaders(headerGroups, baseHeaders);
 	/** @type {RequestInit} */
@@ -124,13 +126,21 @@ export default function createRequest({
 				init.body = createForm(body);
 			} else {
 				headers['Content-Type'] = 'application/json';
-				const blob = new Blob([JSON.stringify(body)]);
+				const blob = new Blob([
+					typeof stringifyJSON === 'function'
+						? stringifyJSON(body)
+						: JSON.stringify(body),
+				]);
 				total = blob.size;
 				init.body = blob;
 			}
 		} else if (data) {
 			headers['Content-Type'] = 'application/json';
-			const blob = new Blob([JSON.stringify(data)]);
+			const blob = new Blob([
+				typeof stringifyJSON === 'function'
+					? stringifyJSON(body)
+					: JSON.stringify(body),
+			]);
 			total = blob.size;
 			init.body = blob;
 		}
