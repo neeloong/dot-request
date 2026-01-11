@@ -1,6 +1,6 @@
 {
   "name": "dot-request",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "链式调用 fetch() 或创建 Request 对象",
   "scripts": {
     "build": "tsc -p tsconfig.json && node build.mjs",
