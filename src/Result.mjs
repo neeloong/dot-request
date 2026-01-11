@@ -19,6 +19,17 @@ export class Result {
 	build(response) {
 		return new Result(response);
 	}
+	/** @type {((value: string) => any)?} */
+	#parseJSON = null;
+	/**
+	 * 设置异常相应处理函数
+	 * @param {((value: string) => any)?} fn
+	 * @returns {this}
+	 */
+	parseJSON(fn) {
+		this.#parseJSON = typeof fn === 'function' ? fn : null;
+		return this;
+	}
 	/**
 	 * 获取文本格式的相应体
 	 * @returns {Promise<string>}
@@ -42,9 +53,17 @@ export class Result {
 	/**
 	 * 获取 JSON 格式的相应体
 	 * @template T
+	 * @param {(this: any, key: string, value: any) => any} [reviver]
 	 * @returns {Promise<T>}
 	 */
-	json() { return this.#response.then(r => r.json()); }
+	json(reviver) {
+		return this.#response.then(r => r.text()).then(r => {
+			const parseJSON = this.#parseJSON;
+			if (typeof parseJSON === 'function') { return parseJSON(r); }
+			if (typeof reviver !== 'function') { return JSON.parse(r); }
+			return JSON.parse(r, reviver);
+		});
+	}
 	/**
 	 * 获取 UrlSearchParams 格式的相应体
 	 * @returns {Promise<URLSearchParams>}
@@ -75,7 +94,11 @@ export class Result {
 				return r.text();
 			}
 			if (mime === 'application/json' || mime === 'text/json') {
-				return r.json();
+				return r.text().then(r => {
+					const parseJSON = this.#parseJSON;
+					if (typeof parseJSON === 'function') { return parseJSON(r); }
+					return JSON.parse(r);
+				});
 			}
 			if (mime === 'application/x-www-form-urlencoded') {
 				return r.text().then(t => new URLSearchParams(t));
@@ -118,11 +141,31 @@ export class Result {
 	}
 	/**
 	 * 复制相应结果
+	 * @template {Result} T
+	 * @overload
+	 * @param {T} target
+	 * @returns {T}
+	 */
+	/**
+	 * 复制相应结果
+	 * @overload
 	 * @returns {ReturnType<this['build']>}
 	 */
-	clone() {
+	/**
+	 * 复制相应结果
+	 * @template {Result} T
+	 * @param {T} [target]
+	 * @returns {ReturnType<this['build'] | T>}
+	 */
+	clone(target) {
+		const api = target instanceof Result
+			? target
+			: this.build(this.#response.then(r => r.clone()));
+		if (api !== this) {
+			api.#parseJSON = this.#parseJSON;
+		}
 		// @ts-ignore
-		return this.build(this.#response.then(r => r.clone()));
+		return api;
 	}
 
 	/**

@@ -73,6 +73,8 @@ class DotRequest {
 	#downloadProgress = null;
 	/** @type {ErrorHandler?} */
 	#errorHandler = null;
+	/** @type {((value: string) => any)?} */
+	#parseJSON = null;
 	get version() { return '__VERSION__'; }
 	/**
 	 * @returns {DotRequest}
@@ -109,6 +111,7 @@ class DotRequest {
 			api.#context = this.#context;
 			api.#downloadProgress = this.#downloadProgress;
 			api.#errorHandler = this.#errorHandler;
+			api.#parseJSON = this.#parseJSON;
 		}
 		// @ts-ignore
 		return api;
@@ -715,6 +718,15 @@ class DotRequest {
 		return this;
 	}
 	/**
+	 * 设置异常相应处理函数
+	 * @param {((value: string) => any)?} fn
+	 * @returns {this}
+	 */
+	parseJSON(fn) {
+		this.#parseJSON = typeof fn === 'function' ? fn : null;
+		return this;
+	}
+	/**
 	 * 创建对应的 Request 对象
 	 * @returns {Request}
 		*/
@@ -742,6 +754,10 @@ class DotRequest {
 		const dotRequest = this.clone();
 		const response = this.#fetch(this.create(), dotRequest);
 		let result = this.buildResult(response);
+		const parseJSON = this.#parseJSON;
+		if (typeof parseJSON === 'function') {
+			result = result.parseJSON(parseJSON);
+		}
 		const dp = this.#downloadProgress;
 		if (dp) { result = result.downloadProgress(dp); }
 		const eh = this.#errorHandler;
@@ -779,9 +795,10 @@ class DotRequest {
 	/**
 	 * 发送请求，并获取 JSON 格式的相应体
 	 * @template T
+	 * @param {(this: any, key: string, value: any) => any} [reviver]
 	 * @returns {Promise<T>}
 	 */
-	json() { return this.fetch().ok().json(); }
+	json(reviver) { return this.fetch().ok().json(reviver); }
 	/**
 	 * 发送请求，并获取 UrlSearchParams 格式的相应体
 	 * @returns {Promise<URLSearchParams>}
