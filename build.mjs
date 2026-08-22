@@ -3,7 +3,11 @@ import fsPromise from 'node:fs/promises';
 import { rollup } from 'rollup';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
+/** @import { ModuleFormat } from 'rollup' */
 
+/**
+ * @type {{name: string; [k: string]: any}}
+ */
 const {
 	name, description, version, engines, dependencies,
 	author, license, homepage, repository, bugs,
@@ -74,7 +78,7 @@ const bundle = await rollup({
 });
 
 
-/** @type {[string, string, boolean?][]} */
+/** @type {[ModuleFormat, string, boolean?][]} */
 const outputOptionsList = [
 	['esm', 'mjs'],
 	['cjs', 'cjs'],
@@ -96,7 +100,7 @@ for (const [format, ext, min] of outputOptionsList) {
 
 	await fsPromise.writeFile(
 		pathFn.resolve('dist', `index${min ? '.min' : ''}.${ext}`),
-		chunk.source || chunk.code || ''
+		chunk.code || ''
 	);
 }
 

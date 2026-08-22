@@ -8,12 +8,13 @@ import createSignalMap from './createSignalMap.mjs';
 
 /**
  *
- * @param {string | TemplateStringsArray | undefined} template
+ * @param {string | (() => string) | TemplateStringsArray | undefined} template
  * @param  {...any} values
- * @returns
+ * @returns {string | (() => string)}
  */
 function toString(template, ...values) {
 	if (!template) { return ''; }
+	if (typeof template === 'function') { return template; }
 	if (typeof template === 'string') { return template; }
 	return String.raw(template, ...values.map(v => encodeURIComponent(v)));
 }
@@ -119,7 +120,7 @@ class DotRequest {
 	/**
 	 * 设置请求方法
 	 * @param {string} method 请求方法
-	 * @param {string} [path] 新的路径
+	 * @param {string | (() => string)} [path] 新的路径
 	 * @returns {this}
 	 */
 	method(method, path) {
@@ -133,7 +134,7 @@ class DotRequest {
 	/**
 	 * 将请求方法设置为 `GET`
 	 * @overload
-	 * @param {string} [path] 新的路径
+	 * @param {string | (() => string)} [path] 新的路径
 	 * @returns {this}
 	 */
 	/**
@@ -145,14 +146,14 @@ class DotRequest {
 	 */
 	/**
 	 * 将请求方法设置为 `GET`
-	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
+	 * @param {[string | (() => string) | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {this}
 	 */
 	get(...args) { return this.method('get', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `POST`
 	 * @overload
-	 * @param {string} [path] 新的路径
+	 * @param {string | (() => string)} [path] 新的路径
 	 * @returns {this}
 	 */
 	/**
@@ -164,14 +165,14 @@ class DotRequest {
 	 */
 	/**
 	 * 将请求方法设置为 `POST`
-	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
+	 * @param {[string | (() => string) | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {this}
 	 */
 	post(...args) { return this.method('post', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `PUT`
 	 * @overload
-	 * @param {string} [path] 新的路径
+	 * @param {string | (() => string)} [path] 新的路径
 	 * @returns {this}
 	 */
 	/**
@@ -183,14 +184,14 @@ class DotRequest {
 	 */
 	/**
 	 * 将请求方法设置为 `PUT`
-	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
+	 * @param {[string | (() => string) | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {this}
 	 */
 	put(...args) { return this.method('put', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `DELETE`
 	 * @overload
-	 * @param {string} [path] 新的路径
+	 * @param {string | (() => string)} [path] 新的路径
 	 * @returns {this}
 	 */
 	/**
@@ -202,14 +203,14 @@ class DotRequest {
 	 */
 	/**
 	 * 将请求方法设置为 `DELETE`
-	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
+	 * @param {[string | (() => string) | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {this}
 	 */
 	delete(...args) { return this.method('delete', toString(...args)); }
 	/**
 	 * 将请求方法设置为 `HEAD`
 	 * @overload
-	 * @param {string} [path] 新的路径
+	 * @param {string | (() => string)} [path] 新的路径
 	 * @returns {this}
 	 */
 	/**
@@ -221,14 +222,14 @@ class DotRequest {
 	 */
 	/**
 	 * 将请求方法设置为 `HEAD`
-	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
+	 * @param {[string | (() => string) | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {this}
 	 */
 	head(...args) { return this.method('head', toString(...args)); }
 	/**
 	 * 修改请求路径
 	 * @overload
-	 * @param {string} path 新的路径
+	 * @param {string | (() => string)} path 新的路径
 	 * @returns {this}
 	 */
 	/**
@@ -240,7 +241,7 @@ class DotRequest {
 	 */
 	/**
 	 * 修改请求路径
-	 * @param {[string | TemplateStringsArray, ...any]} args
+	 * @param {[string | (() => string) | TemplateStringsArray, ...any]} args
 	 * @returns {this}
 	 */
 	path(...args) {
@@ -251,7 +252,7 @@ class DotRequest {
 	/**
 	 * 修改请求路径前缀
 	 * @overload
-	 * @param {string} [prefix] 新的路径前缀
+	 * @param {string | (() => string)} [prefix] 新的路径前缀
 	 * @returns {this}
 	 */
 	/**
@@ -263,7 +264,7 @@ class DotRequest {
 	 */
 	/**
 	 * 修改请求路径前缀
-	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
+	 * @param {[string | (() => string) | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {this}
 	 */
 	prefix(...args) {
@@ -273,7 +274,7 @@ class DotRequest {
 	/**
 	 * 修改请求路径后缀
 	 * @overload
-	 * @param {string} [suffix] 新的路径后缀
+	 * @param {string | (() => string)} [suffix] 新的路径后缀
 	 * @returns {this}
 	 */
 	/**
@@ -285,7 +286,7 @@ class DotRequest {
 	 */
 	/**
 	 * 修改请求路径后缀
-	 * @param {[string | TemplateStringsArray | undefined, ...any]} args
+	 * @param {[string | (() => string) | TemplateStringsArray | undefined, ...any]} args
 	 * @returns {this}
 	 */
 	suffix(...args) {

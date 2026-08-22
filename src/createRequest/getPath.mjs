@@ -58,10 +58,10 @@ function createReplace(params) {
 const regex = /^([^?#]*)((?:\?[^#]*)?)((?:#[\s\S]*)?)$/;
 /**
  *
- * @param {string} prefix
- * @param {string} path
- * @param {string[]} append
- * @param {string} suffix
+ * @param {string | (() => string)} prefix
+ * @param {string | (() => string)} path
+ * @param {(string | (() => string))[]} append
+ * @param {string | (() => string)} suffix
  * @param {Record<string, any>} [params]
  * @param {Record<string, any>[]} [query]
  * @param {string} [search]
@@ -79,6 +79,7 @@ export default function getPath(
 	data,
 ) {
 	const paths = [prefix, path, ...append]
+		.map(v => typeof v === 'function' ? v() : v)
 		.map(p => p && regex.exec(p) || ['', '', '']);
 	let p = paths.map(([, v]) => v)
 		.map(createReplace(params))

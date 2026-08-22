@@ -9,10 +9,10 @@ import StatisticsStream from '../StatisticsStream.mjs';
 /**
  * @typedef {object} RequestParams
  * @property {string} [method]
- * @property {string} prefix
- * @property {string} path
- * @property {string[]} append
- * @property {string} suffix
+ * @property {string | (() => string)} prefix
+ * @property {string | (() => string)} path
+ * @property {(string | (() => string))[]} append
+ * @property {string | (() => string)} suffix
  *
  * @property {(() => Record<string, HeaderValue>?)[]} headerGroups
  * @property {Record<string, HeaderValue | (() => HeaderValue)>} headers
@@ -109,6 +109,7 @@ export default function createRequest({
 				headers['Content-Type'] = type;
 			}
 			total = body.byteLength;
+			// @ts-ignore
 			init.body = body;
 		} else if (body && typeof body === 'string') {
 			if (type && typeof type === 'string') {
