@@ -597,6 +597,7 @@ class DotRequest {
 	}
 	/**
 	 * 设置查询参数
+	 * @deprecated
 	 * @param {Record<string, any>} [query]
 	 * @returns {this}
 	 */
@@ -611,11 +612,32 @@ class DotRequest {
 	}
 	/**
 	 * 设置查询字符串
+	 * @overload
 	 * @param {string} [search]
 	 * @returns {this}
 	 */
+	/**
+	 * 设置查询参数
+	 * @overload
+	 * @param {Record<string, any> | null} query
+	 * @returns {this}
+	 */
+	/**
+	 * 设置查询字符串或参数
+	 * @param {string | Record<string, any> | null} [search]
+	 * @returns {this}
+	 */
 	search(search) {
-		this.#options.search =search;
+		if (typeof search !== 'object') {
+			this.#options.search = search;
+			return this;
+		}
+		if (!search) {
+			delete this.#options.query;
+			return this;
+		}
+		const oldQuery = this.#options.query;
+		this.#options.query = oldQuery ? [ ...oldQuery, search ] : [search];
 		return this;
 	}
 	/**
