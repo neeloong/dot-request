@@ -329,16 +329,6 @@ class DotRequest {
 		this.#options.params = params ? { ...this.#options.params, ...params } : {};
 		return this;
 	}
-	/** @deprecated 设置查询参数 */
-	query(query?: Record<string, any>): this {
-		if (!query) {
-			delete this.#options.query;
-			return this;
-		}
-		const oldQuery = this.#options.query;
-		this.#options.query = oldQuery ? [...oldQuery, query] : [query];
-		return this;
-	}
 	/** 设置查询字符串 */
 	search(search?: string): this
 	/** 设置查询参数 */
