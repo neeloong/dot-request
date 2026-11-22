@@ -3,7 +3,7 @@
   "version": "0.5.6",
   "description": "链式调用 fetch() 或创建 Request 对象",
   "scripts": {
-    "build": "tsc -p tsconfig.json && node build.mjs",
+    "build": "node build.mts",
     "lint": "eslint --fix"
   },
   "author": "猛火 Fierflame",
@@ -17,11 +17,15 @@
   },
   "homepage": "https://gitee.com/neeloong/dot-request#git-readme",
   "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/plugin-transform-typescript": "^7.29.7",
+    "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-replace": "^5.0.7",
     "@rollup/plugin-terser": "^0.4.4",
     "@types/node": "^20.16.3",
     "eslint": "^9.9.1",
-    "rollup": "^4.21.2",
-    "typescript": "^5.5.4"
+    "rollup": "^4.60.4",
+    "rollup-plugin-dts": "^6.4.1",
+    "typescript": "^6.0.3"
   }
 }

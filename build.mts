@@ -1,17 +1,16 @@
+import type { ModuleFormat } from 'rollup';
 import pathFn from 'node:path';
 import fsPromise from 'node:fs/promises';
 import { rollup } from 'rollup';
+import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
-/** @import { ModuleFormat } from 'rollup' */
+import dts from 'rollup-plugin-dts';
 
-/**
- * @type {{name: string; [k: string]: any}}
- */
 const {
 	name, description, version, engines, dependencies,
 	author, license, homepage, repository, bugs,
-} = JSON.parse(await fsPromise.readFile('./package.json', 'utf-8'));
+}: { name: string;[k: string]: any } = JSON.parse(await fsPromise.readFile('./package.json', 'utf-8'));
 
 const banner = `\
 /*!
@@ -25,17 +24,19 @@ console.log('移除 dist 目录...');
 await fsPromise.rm('dist', { recursive: true }).catch(() => { });
 console.log('创建 dist 目录...');
 await fsPromise.mkdir(`dist`, { recursive: true });
-console.log('创建 dist/package.json ...');
+console.log('生成 dist/package.json ...');
 await fsPromise.writeFile(`dist/package.json`, JSON.stringify({
 	name, description, version, engines, dependencies,
 	module: 'index.mjs',
 	main: 'index.cjs',
 	unpkg: 'index.js',
 	jsdelivr: 'index.js',
+	types: './index.d.mts',
 	author, license, homepage, repository, bugs,
 	exports: {
 		'.': {
-			types: './index.d.ts',
+			import: './index.mjs',
+			types: './index.d.mts',
 			node: './index.cjs',
 			module: './index.mjs',
 			unpkg: './index.js',
@@ -44,42 +45,38 @@ await fsPromise.writeFile(`dist/package.json`, JSON.stringify({
 	},
 }, null, 2));
 
-console.log('创建 dist/index.d.ts ...');
-const [mainDts, resultDts, typesDts] = await Promise.all([
-	fsPromise.readFile('types/DotRequest.d.mts', 'utf-8'),
-	fsPromise.readFile('types/Result.d.mts', 'utf-8'),
-	fsPromise.readFile('types/types.d.mts', 'utf-8'),
-]);
+const input = 'src/index.mts';
+const replacePlugin = replace({
+	preventAssignment: true, values: {
+		__VERSION__: version,
+	}
+});
+const babelPlugin = babel({
+	extensions: ['.ts', '.mts', '.js', '.mjs'],
+	babelHelpers: 'bundled',
+	plugins: ['@babel/plugin-transform-typescript'],
+});
+console.log('生成 dist/index.d.mts ...');
+const dtsBundle = await rollup({
+	input,
+	plugins: [replacePlugin, babelPlugin, dts()],
+});
+const { output: [chunk] } = await dtsBundle.generate({
+	format: 'esm',
+	banner,
+	exports: 'default',
+});
+await fsPromise.writeFile(
+	pathFn.resolve('dist', `index.d.mts`),
+	chunk.code || ''
+);
 
-const dts = `declare namespace DotRequest {
-${typesDts.replace(/^(?!$)/gm, '    ')}
-${resultDts.replace(/^(?!$)/gm, '    ')}
-}
-${mainDts.replace(/\bexport\b/g, 'declare')}
-export default DotRequest`
-	.replace(/import\((["']).\/(DotRequest|types|Result).mjs\1\)/g, 'DotRequest')
-	.replaceAll('DotRequest.DotRequest', 'DotRequest')
-	.replaceAll(`import { Result } from './Result.mjs';`, '')
-	.replace(/\n\s*static get Result\(\): typeof Result;/, '');
-await fsPromise.writeFile('dist/index.d.ts', dts);
-
-
-
-console.log('打包...');
 const bundle = await rollup({
-	input: 'src/index.mjs',
-	plugins: [
-		replace({
-			preventAssignment: true, values: {
-				__VERSION__: version,
-			}
-		}),
-	],
+	input,
+	plugins: [replacePlugin, babelPlugin],
 });
 
-
-/** @type {[ModuleFormat, string, boolean?][]} */
-const outputOptionsList = [
+const outputOptionsList: [ModuleFormat, string, boolean?][] = [
 	['esm', 'mjs'],
 	['cjs', 'cjs'],
 	['umd', 'js'],
@@ -89,7 +86,7 @@ const outputOptionsList = [
 const umdName = name.replace(/-([a-z])/g, (_, v) => v.toUpperCase());
 for (const [format, ext, min] of outputOptionsList) {
 
-	console.log(`创建 dist/index${min ? '.min' : ''}.${ext} ...`);
+	console.log(`生成 dist/index${min ? '.min' : ''}.${ext} ...`);
 	const { output: [chunk] } = await bundle.generate({
 		format,
 		name: umdName,
@@ -104,14 +101,10 @@ for (const [format, ext, min] of outputOptionsList) {
 	);
 }
 
-console.log('复制文件...');
 for (const file of await fsPromise.readdir('.', 'utf-8')) {
 	if (/^(README|LICENSE)(\..+)?$/.test(file)) {
-		console.log(`  ${file}...`);
-		await fsPromise.writeFile(
-			pathFn.resolve('dist', file),
-			await fsPromise.readFile(file),
-		);
+		console.log(`复制 ${file}...`);
+		await fsPromise.copyFile(file, pathFn.resolve('dist', file));
 	}
 }
 console.log('完成');

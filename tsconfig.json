@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
+    "lib": ["ESNext", "ES2025", "DOM"],
     "allowJs": true,
     "checkJs": true,
     "target": "esnext",
-    "outDir": "types",
+    "rootDir": "./src",
+    "outDir": "./types",
     "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -11,7 +13,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "noImplicitThis": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "Bundler",
   },
   "include": ["src/**/*"]
 }
