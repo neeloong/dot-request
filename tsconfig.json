@@ -4,6 +4,7 @@
     "checkJs": true,
     "target": "esnext",
     "outDir": "types",
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "strictNullChecks": true,

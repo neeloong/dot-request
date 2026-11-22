@@ -1,52 +1,48 @@
-/** @import { HeaderValue, ProgressListener, Signal, SignalHandler } from '../types.mjs' */
+import type { DotRequest } from '../DotRequest.mts';
 
-import getSignal from './getSignal.mjs';
-import getPath from './getPath.mjs';
-import createHeaders from './createHeaders.mjs';
-import createForm from './createForm.mjs';
-import mergeSignal from './mergeSignal.mjs';
-import StatisticsStream from '../StatisticsStream.mjs';
-/**
- * @typedef {object} RequestParams
- * @property {string} [method]
- * @property {string | (() => string)} prefix
- * @property {string | (() => string)} path
- * @property {(string | (() => string))[]} append
- * @property {string | (() => string)} suffix
- *
- * @property {(() => Record<string, HeaderValue>?)[]} headerGroups
- * @property {Record<string, HeaderValue | (() => HeaderValue)>} headers
- *
- * @property {Record<string, any>} params
- * @property {Record<string, any>[]} [query]
- * @property {string} [search]
- * @property {any} [data]
- * @property {any} [body]
- * @property {string | boolean} [type]
- *
- * @property {Signal | boolean | null} signal
- * @property {SignalHandler?} signalHandler
- *
- * @property {boolean | 'error' | 'follow' | 'manual'} redirect
- *
- * @property {number} timeout
- * @property {string} integrity
- * @property {boolean} keepalive
- * @property {RequestCredentials | null} credentials
- * @property {RequestMode | null} mode
- * @property {RequestCache | null} cache
- * @property {string} referrer
- * @property {ReferrerPolicy | null} referrerPolicy
- * @property {ProgressListener?} uploadProgress
- * @property {((value: any) => string)?} stringifyJSON
- */
+import getSignal from './getSignal.mts';
+import getPath from './getPath.mts';
+import createHeaders from './createHeaders.mts';
+import createForm from './createForm.mts';
+import StatisticsStream from '../StatisticsStream.mts';
+
+export interface RequestParams {
+	method?: string;
+	prefix: string | (() => string);
+	path: string | (() => string);
+	append: (string | (() => string))[];
+	suffix: string | (() => string);
+	headerGroups: Array<(() => Record<string, DotRequest.HeaderValue> | null)>;
+	headers: Record<string, DotRequest.HeaderValue | (() => DotRequest.HeaderValue)>;
+	params: Record<string, any>;
+	query?: Record<string, any>[];
+	search?: string;
+	data?: any;
+	body?: any;
+	type?: string | boolean;
+	signal: DotRequest.Signal | boolean | null;
+	signalHandler: DotRequest.SignalHandler | null;
+	redirect: boolean | 'error' | 'follow' | 'manual';
+	timeout: number;
+	integrity: string;
+	keepalive: boolean;
+	credentials: RequestCredentials | null;
+	mode: RequestMode | null;
+	cache: RequestCache | null;
+	referrer: string;
+	referrerPolicy: ReferrerPolicy | null;
+	uploadProgress: DotRequest.ProgressListener | null;
+	stringifyJSON: ((value: any) => string) | null;
+}
 
 
-/**
- *
- * @param {RequestParams} params
- * @returns {Request}
- */
+function mergeSignal(...signals: (AbortSignal | null)[]): AbortSignal | null {
+	const list = signals.filter(v => v instanceof AbortSignal);
+	if (!list.length) { return null; }
+	if (list.length === 1) { return list[0]; }
+	return AbortSignal.any(list);
+}
+
 export default function createRequest({
 	method = 'get',
 	prefix, path, append, suffix,
@@ -59,10 +55,9 @@ export default function createRequest({
 	timeout,
 	integrity, keepalive, credentials, mode, cache, referrer, referrerPolicy,
 	stringifyJSON,
-}) {
+}: RequestParams): Request {
 	const headers = createHeaders(headerGroups, baseHeaders);
-	/** @type {RequestInit} */
-	const init = {
+	const init: RequestInit = {
 		method,
 		headers,
 		// @ts-ignore
@@ -109,8 +104,7 @@ export default function createRequest({
 				headers['Content-Type'] = type;
 			}
 			total = body.byteLength;
-			// @ts-ignore
-			init.body = body;
+			init.body = body as ArrayBuffer | ArrayBufferView<ArrayBuffer>;
 		} else if (body && typeof body === 'string') {
 			if (type && typeof type === 'string') {
 				headers['Content-Type'] = type;

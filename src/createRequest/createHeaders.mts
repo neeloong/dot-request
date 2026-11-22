@@ -1,13 +1,10 @@
-/** @import { HeaderValue } from '../types.mjs' */
-/**
- *
- * @param {(() => Record<string, HeaderValue>?)[]} headerGroups
- * @param {Record<string, HeaderValue | (() => HeaderValue)>} [baseHeaders]
- * @returns
- */
-export default function createHeaders(headerGroups, baseHeaders) {
-	/** @type {Record<string, string | string>} */
-	const headers = {};
+import type { DotRequest } from '../DotRequest.mts';
+
+export default function createHeaders(
+	headerGroups: (() => Record<string, DotRequest.HeaderValue> | null)[],
+	baseHeaders?: Record<string, DotRequest.HeaderValue | (() => DotRequest.HeaderValue)>,
+) {
+	const headers: Record<string, string | string> = {};
 	for (const get of headerGroups) {
 		const h = get();
 		if (!h || typeof h !== 'object') { continue; }

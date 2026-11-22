@@ -1,5 +1,5 @@
-/** @import { Fetch, ProgressListener, ErrorHandler, HeaderValue, BodyData, Signal, SignalHandler, SignalMap, SignalMapToken } from '../types.mjs' */
-import createSignalMap from '../createSignalMap.mjs';
+import type { DotRequest } from '../DotRequest.mts';
+import createSignalMap from '../createSignalMap.mts';
 
 const types = new Set([
 	'object',
@@ -11,13 +11,7 @@ const types = new Set([
 ]);
 const abortTokens = createSignalMap();
 
-/**
- *
- * @param {SignalMap} tokens
- * @param {*} [signal]
- * @returns {AbortSignal?}
- */
-function toSignal(tokens, signal) {
+function toSignal(tokens: DotRequest.SignalMap, signal?: any): AbortSignal | null {
 	if (!types.has(typeof signal)) { return null; }
 	if (signal === null || signal === false) { return null; }
 	tokens.get(signal)?.abort();
@@ -25,12 +19,8 @@ function toSignal(tokens, signal) {
 	tokens.set(signal, ac);
 	return ac.signal;
 }
-/**
- *
- * @param {*} v
- * @returns {v is SignalMap}
- */
-function isSignalMap(v) {
+
+function isSignalMap(v: any): v is DotRequest.SignalMap {
 	if (!v) { return false; }
 	if (typeof v !== 'object') { return false; }
 	if (typeof v.get !== 'function') { return false; }
@@ -38,16 +28,11 @@ function isSignalMap(v) {
 	return true;
 }
 
-/** @type {Map<SignalMapToken, SignalMap>} */
-const signalMaps = new Map();
+const signalMaps: Map<DotRequest.SignalMapToken, DotRequest.SignalMap> = new Map();
 
 const mapTypes = new Set(['string', 'symbol', 'number', 'bigint']);
-/**
- *
- * @param {*} [handler]
- * @returns {SignalMap}
- */
-function toSignalMap(handler) {
+
+function toSignalMap(handler?: any): DotRequest.SignalMap {
 	if (isSignalMap(handler)) { return handler; }
 	if (!mapTypes.has(typeof handler)) { return abortTokens; }
 	const oldMap = signalMaps.get(handler);
@@ -56,16 +41,11 @@ function toSignalMap(handler) {
 	signalMaps.set(handler, map);
 	return map;
 }
-/**
- *
- * @param {Signal?} signal
- * @param {SignalHandler?} handler
- * @returns {AbortSignal?}
- */
+
 export default function getSignal(
-	signal,
-	handler,
-) {
+	signal: DotRequest.Signal | null,
+	handler: DotRequest.SignalHandler | null,
+): AbortSignal | null {
 	if (signal instanceof AbortSignal) { return signal; }
 	if ((signal ?? null) === null || signal === false) { return null; }
 	if (typeof handler === 'function') {

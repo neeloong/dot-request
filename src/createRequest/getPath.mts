@@ -1,27 +1,17 @@
-import getFromData from './getFromData.mjs';
+import getFromData from './getFromData.mts';
 
-/**
- *
- * @param {string} name
- * @param {string[]} keys
- * @returns
- */
-function getKey(name, keys) {
+
+function getKey(name: string, keys: string[]) {
 	const nameDecoded = decodeURIComponent(name);
 	const keysDecoded = keys.map(k => `[${decodeURIComponent(k)}]`).join('');
 	return `${nameDecoded}${keysDecoded}`;
 }
-/**
- *
- * @param {*} query
- * @returns {string[]}
- */
-function queryStringify(query) {
+
+function queryStringify(query: any): string[] {
 	if (query instanceof URLSearchParams) {
 		return [query.toString()];
 	}
-	/** @type {string[]} */
-	const text = [];
+	const text: string[] = [];
 	if (!query) { return text; }
 	for (const [k, v] of Object.entries(query)) {
 		for (const [name, keys, value] of getFromData(k, [], v)) {
@@ -40,12 +30,9 @@ function queryStringify(query) {
 	return text;
 }
 
-/**
- *
- * @param {Record<string, any>} [params]
- * @returns {(p: string) => string}
- */
-function createReplace(params) {
+function createReplace(
+	params?: Record<string, any>,
+): (p: string) => string {
 	if (params) {
 		return p => p.replace(
 			/:([a-zA-Z0-9][a-zA-Z0-9]*)/g,
@@ -56,27 +43,16 @@ function createReplace(params) {
 }
 
 const regex = /^([^?#]*)((?:\?[^#]*)?)((?:#[\s\S]*)?)$/;
-/**
- *
- * @param {string | (() => string)} prefix
- * @param {string | (() => string)} path
- * @param {(string | (() => string))[]} append
- * @param {string | (() => string)} suffix
- * @param {Record<string, any>} [params]
- * @param {Record<string, any>[]} [query]
- * @param {string} [search]
- * @param {*} [data]
- * @returns
- */
+
 export default function getPath(
-	prefix,
-	path,
-	append,
-	suffix,
-	params,
-	query,
-	search,
-	data,
+	prefix: string | (() => string),
+	path: string | (() => string),
+	append: (string | (() => string))[],
+	suffix: string | (() => string),
+	params?: Record<string, any>,
+	query?: Record<string, any>[],
+	search?: string,
+	data?: any,
 ) {
 	const paths = [prefix, path, ...append]
 		.map(v => typeof v === 'function' ? v() : v)
