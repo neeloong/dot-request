@@ -129,6 +129,13 @@ class DotRequest {
 	/** 将请求方法设置为 `HEAD` */
 	head(...args: [string | (() => string) | TemplateStringsArray | undefined, ...any]): this
 	head(...args: [string | (() => string) | TemplateStringsArray | undefined, ...any]): this { return this.method('head', toString(...args)); }
+	/** 将请求方法设置为 `QUERY` */
+	query(path?: string | (() => string)): this
+	/** 将请求方法设置为 `QUERY` */
+	query(template: TemplateStringsArray, ...substitutions: unknown[]): this
+	/** 将请求方法设置为 `QUERY` */
+	query(...args: [string | (() => string) | TemplateStringsArray | undefined, ...any]): this
+	query(...args: [string | (() => string) | TemplateStringsArray | undefined, ...any]): this { return this.method('query', toString(...args)); }
 	/** 修改请求路径 */
 	path(path: string | (() => string)): this
 	/** 修改请求路径 */
